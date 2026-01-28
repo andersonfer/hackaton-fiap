@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: fiapx-video-processor
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+server:
+  port: 8080
+
+app:
+  armazenamento:
+    diretorio-videos: ${DIRETORIO_VIDEOS:/tmp/fiapx/videos}
+    diretorio-frames: ${DIRETORIO_FRAMES:/tmp/fiapx/frames}
+    diretorio-zips: ${DIRETORIO_ZIPS:/tmp/fiapx/zips}

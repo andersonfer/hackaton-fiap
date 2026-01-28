@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DIRETORIO_VIDEOS=/app/data/videos
+      - DIRETORIO_FRAMES=/app/data/frames
+      - DIRETORIO_ZIPS=/app/data/zips
+    volumes:
+      - app-data:/app/data
+
+volumes:
+  app-data:
