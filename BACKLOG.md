@@ -31,17 +31,17 @@
 - [x] Filtrar videos por usuario
 - [x] Testes de autenticacao
 
-### ⏳ Git: Commit
-- [ ] Commit da Entrega 4 ← ATUAL
+### 🔄 Entrega 5: Testes E2E + Refinamento
+- [ ] Testes E2E dos endpoints (fluxo completo) ← ATUAL
+- [ ] Refinamento e ajustes de codigo
 
-### ⏳ Entrega 5: Kubernetes
+### ⏳ Entrega 6: CI/CD + Documentacao
+- [ ] GitHub Actions pipeline (build, test, docker)
+- [ ] README completo com instrucoes
+- [ ] Documentacao da arquitetura (diagrama)
+
+### ⏳ Entrega 7: Kubernetes (OPCIONAL)
 - [ ] Manifests k8s
 - [ ] PersistentVolume
 - [ ] Deploy MySQL/RabbitMQ
 - [ ] Script para minikube
-
-### ⏳ Entrega 6: CI/CD + Documentacao
-- [ ] GitHub Actions pipeline
-- [ ] README completo
-- [ ] Documento de arquitetura
-- [ ] Video de apresentacao
