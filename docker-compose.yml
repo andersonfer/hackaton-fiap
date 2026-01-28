@@ -10,10 +10,16 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/fiapx?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=fiapx
       - SPRING_DATASOURCE_PASSWORD=fiapx123
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=fiapx
+      - SPRING_RABBITMQ_PASSWORD=fiapx123
     volumes:
       - app-data:/app/data
     depends_on:
       mysql:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   mysql:
@@ -33,6 +39,23 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=fiapx
+      - RABBITMQ_DEFAULT_PASS=fiapx123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   app-data:
   mysql-data:
+  rabbitmq-data:

@@ -17,6 +17,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:fiapx}
+    password: ${SPRING_RABBITMQ_PASSWORD:fiapx123}
 
 server:
   port: 8080
@@ -26,3 +31,6 @@ app:
     diretorio-videos: ${DIRETORIO_VIDEOS:/tmp/fiapx/videos}
     diretorio-frames: ${DIRETORIO_FRAMES:/tmp/fiapx/frames}
     diretorio-zips: ${DIRETORIO_ZIPS:/tmp/fiapx/zips}
+  mensageria:
+    fila-processamento: fila.video.processamento
+    concorrencia: 3

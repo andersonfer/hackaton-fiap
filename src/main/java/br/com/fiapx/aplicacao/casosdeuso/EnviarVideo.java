@@ -1,7 +1,7 @@
 package br.com.fiapx.aplicacao.casosdeuso;
 
 import br.com.fiapx.aplicacao.gateway.ArmazenamentoArquivoGateway;
-import br.com.fiapx.aplicacao.gateway.ProcessadorVideoGateway;
+import br.com.fiapx.aplicacao.gateway.FilaMensagemGateway;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.repositorio.VideoRepositorio;
 
@@ -11,14 +11,14 @@ import java.nio.file.Path;
 public class EnviarVideo {
 
     private final ArmazenamentoArquivoGateway armazenamentoGateway;
-    private final ProcessadorVideoGateway processadorGateway;
+    private final FilaMensagemGateway filaMensagemGateway;
     private final VideoRepositorio videoRepositorio;
 
     public EnviarVideo(ArmazenamentoArquivoGateway armazenamentoGateway,
-                       ProcessadorVideoGateway processadorGateway,
+                       FilaMensagemGateway filaMensagemGateway,
                        VideoRepositorio videoRepositorio) {
         this.armazenamentoGateway = armazenamentoGateway;
-        this.processadorGateway = processadorGateway;
+        this.filaMensagemGateway = filaMensagemGateway;
         this.videoRepositorio = videoRepositorio;
     }
 
@@ -28,17 +28,8 @@ public class EnviarVideo {
         Video video = new Video(nomeArquivo, caminhoVideo.toString());
         video = videoRepositorio.salvar(video);
 
-        try {
-            video.marcarComoProcessando();
-            video = videoRepositorio.salvar(video);
+        filaMensagemGateway.publicarParaProcessamento(video.getId(), caminhoVideo.toString());
 
-            Path caminhoZip = processadorGateway.processarVideo(caminhoVideo, video.getId());
-            video.marcarComoConcluido(caminhoZip.toString());
-            armazenamentoGateway.deletarArquivo(caminhoVideo);
-        } catch (Exception e) {
-            video.marcarComoFalha(e.getMessage());
-        }
-
-        return videoRepositorio.salvar(video);
+        return video;
     }
 }

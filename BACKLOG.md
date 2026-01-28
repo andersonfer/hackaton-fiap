@@ -17,15 +17,15 @@
 - [x] GET /api/videos (listagem)
 - [x] Testes de integracao
 
-### ⏳ Git: Commit
-- [ ] Commit da Entrega 2 ← ATUAL
+### ✅ Entrega 3: Processamento Assincrono
+- [x] RabbitMQ no Docker Compose
+- [x] PublicadorMensagemVideo
+- [x] OuvinteMensagemVideo
+- [x] Retorno assincrono no envio
+- [x] Testes de integracao
 
-### ⏳ Entrega 3: Processamento Assincrono
-- [ ] RabbitMQ no Docker Compose
-- [ ] PublicadorMensagemVideo
-- [ ] OuvinteMensagemVideo
-- [ ] Retorno assincrono no envio
-- [ ] Testes de integracao
+### ⏳ Git: Commit
+- [ ] Commit da Entrega 3 ← ATUAL
 
 ### ⏳ Entrega 4: Autenticacao JWT
 - [ ] Entidade Usuario (pre-cadastrado via SQL)

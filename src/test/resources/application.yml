@@ -11,9 +11,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
 
 app:
   armazenamento:
     diretorio-videos: /tmp/fiapx-test/videos
     diretorio-frames: /tmp/fiapx-test/frames
     diretorio-zips: /tmp/fiapx-test/zips
+  mensageria:
+    habilitado: false
+    fila-processamento: fila.video.processamento.test
+    concorrencia: 1

@@ -1,11 +1,13 @@
 package br.com.fiapx.infraestrutura.persistencia;
 
+import br.com.fiapx.aplicacao.gateway.FilaMensagemGateway;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.enums.StatusVideo;
 import br.com.fiapx.dominio.repositorio.VideoRepositorio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -19,6 +21,9 @@ class VideoRepositorioIntegracaoTest {
 
     @Autowired
     private VideoRepositorio videoRepositorio;
+
+    @MockBean
+    private FilaMensagemGateway filaMensagemGateway;
 
     @Test
     void deveSalvarVideo() {

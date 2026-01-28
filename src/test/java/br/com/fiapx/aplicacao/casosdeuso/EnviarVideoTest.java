@@ -1,7 +1,7 @@
 package br.com.fiapx.aplicacao.casosdeuso;
 
 import br.com.fiapx.aplicacao.gateway.ArmazenamentoArquivoGateway;
-import br.com.fiapx.aplicacao.gateway.ProcessadorVideoGateway;
+import br.com.fiapx.aplicacao.gateway.FilaMensagemGateway;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.enums.StatusVideo;
 import br.com.fiapx.dominio.repositorio.VideoRepositorio;
@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +29,7 @@ class EnviarVideoTest {
     private ArmazenamentoArquivoGateway armazenamentoGateway;
 
     @Mock
-    private ProcessadorVideoGateway processadorGateway;
+    private FilaMensagemGateway filaMensagemGateway;
 
     @Mock
     private VideoRepositorio videoRepositorio;
@@ -37,7 +38,7 @@ class EnviarVideoTest {
 
     @BeforeEach
     void setUp() {
-        enviarVideo = new EnviarVideo(armazenamentoGateway, processadorGateway, videoRepositorio);
+        enviarVideo = new EnviarVideo(armazenamentoGateway, filaMensagemGateway, videoRepositorio);
 
         when(videoRepositorio.salvar(any(Video.class))).thenAnswer(invocation -> {
             Video video = invocation.getArgument(0);
@@ -49,39 +50,34 @@ class EnviarVideoTest {
     }
 
     @Test
-    void deveProcessarVideoComSucesso() {
+    void deveEnviarVideoParaFilaComStatusPendente() {
         String nomeArquivo = "video.mp4";
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
-        Path caminhoZip = Paths.get("/tmp/1.zip");
 
         when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
-        when(processadorGateway.processarVideo(eq(caminhoVideo), any())).thenReturn(caminhoZip);
 
         Video resultado = enviarVideo.executar(nomeArquivo, conteudo);
 
         assertNotNull(resultado);
         assertNotNull(resultado.getId());
         assertEquals(nomeArquivo, resultado.getNomeOriginal());
-        assertEquals(StatusVideo.CONCLUIDO, resultado.getStatus());
-        assertEquals(caminhoZip.toString(), resultado.getCaminhoZip());
-        assertNull(resultado.getMensagemErro());
+        assertEquals(StatusVideo.PENDENTE, resultado.getStatus());
+
+        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
     }
 
     @Test
-    void deveMarcarComoFalhaQuandoOcorrerErro() {
+    void deveSalvarVideoAntesDePublicarNaFila() {
         String nomeArquivo = "video.mp4";
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
 
         when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
-        when(processadorGateway.processarVideo(eq(caminhoVideo), any()))
-                .thenThrow(new RuntimeException("Erro no FFmpeg"));
 
         Video resultado = enviarVideo.executar(nomeArquivo, conteudo);
 
-        assertNotNull(resultado);
-        assertEquals(StatusVideo.FALHA, resultado.getStatus());
-        assertEquals("Erro no FFmpeg", resultado.getMensagemErro());
+        verify(videoRepositorio).salvar(any(Video.class));
+        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
     }
 }
