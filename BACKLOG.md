@@ -31,9 +31,16 @@
 - [x] Filtrar videos por usuario
 - [x] Testes de autenticacao
 
-### 🔄 Entrega 5: Testes E2E + Refinamento
-- [ ] Testes E2E dos endpoints (fluxo completo) ← ATUAL
-- [ ] Refinamento e ajustes de codigo
+### ✅ Entrega 5: Testes E2E + Refinamento
+- [x] Testes E2E dos endpoints (fluxo completo)
+- [x] Script de testes E2E via curl (scripts/e2e-tests.sh)
+- [x] Video de teste (test-data/sample.mp4)
+- [x] Script SQL de inicializacao (docker/init.sql)
+- [x] Mapear regras de negocio e testar edge cases
+  - ProcessarVideoTest (6 testes)
+  - BaixarVideoTest (3 testes)
+  - ListarVideosTest (4 testes)
+  - GAP documentado: Acesso cross-user no download (teste @Disabled)
 
 ### ⏳ Entrega 6: CI/CD + Documentacao
 - [ ] GitHub Actions pipeline (build, test, docker)
@@ -45,3 +52,9 @@
 - [ ] PersistentVolume
 - [ ] Deploy MySQL/RabbitMQ
 - [ ] Script para minikube
+
+### ⏳ Entrega 8: Correcao de Seguranca (OPCIONAL)
+- [ ] Validar propriedade do video no download (acesso cross-user)
+  - Arquivo: BaixarVideo.java e/ou VideoControlador.java
+  - Verificar se video.usuarioId == usuarioAutenticado.id antes de permitir download
+  - Habilitar teste: VideoControladorTest.deveNegarAcessoAoBaixarVideoDeOutroUsuario()
