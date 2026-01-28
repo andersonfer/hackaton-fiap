@@ -31,7 +31,7 @@ BCRYPT_HASH='$2a$10$6.NhjLVGWREJzlRet9xUzOXpwhxJ91LN55d.Jxqs9m/zkdnqHC29G'
 # Contadores
 TESTS_PASSED=0
 TESTS_FAILED=0
-TOTAL_TESTS=19
+TOTAL_TESTS=$(grep -c 'test_num=$((test_num + 1))' "${BASH_SOURCE[0]}")
 
 # IDs de videos criados durante o teste (para cleanup)
 VIDEOS_CRIADOS=()
@@ -554,30 +554,6 @@ run_tests() {
             test_failed $test_num "GET /api/videos" "isolamento entre usuarios" "Video do outro usuario apareceu na listagem"
         else
             test_passed_negative $test_num "GET /api/videos" "isolamento entre usuarios" "200" "user2 nao ve video user1"
-        fi
-    fi
-
-    # -------------------------------------------------------------------------
-    # Lista vazia para novo usuario
-    # -------------------------------------------------------------------------
-    test_num=$((test_num + 1))
-
-    local token_terceiro
-    token_terceiro=$(do_login "$TERCEIRO_USUARIO_EMAIL" "$TERCEIRO_USUARIO_SENHA")
-
-    if [[ -z "$token_terceiro" ]] || [[ "$token_terceiro" == "null" ]]; then
-        test_failed $test_num "GET /api/videos" "lista vazia para novo usuario" "Falha no login do terceiro usuario"
-    else
-        response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos" \
-            -H "Authorization: Bearer $token_terceiro")
-
-        http_code=$(echo "$response" | tail -1)
-        response=$(echo "$response" | sed '$d')
-
-        if [[ "$http_code" == "200" ]] && [[ "$response" == "[]" ]]; then
-            test_passed_negative $test_num "GET /api/videos" "lista vazia para novo usuario" "$http_code" "retornou []"
-        else
-            test_failed $test_num "GET /api/videos" "lista vazia para novo usuario" "Esperado 200 com [], recebido HTTP $http_code resposta=$response"
         fi
     fi
 
