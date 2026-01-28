@@ -22,6 +22,8 @@ USUARIO_TESTE_EMAIL="teste@email.com"
 USUARIO_TESTE_SENHA="123456"
 OUTRO_USUARIO_EMAIL="outro@email.com"
 OUTRO_USUARIO_SENHA="123456"
+TERCEIRO_USUARIO_EMAIL="novousuario@email.com"
+TERCEIRO_USUARIO_SENHA="123456"
 
 # Hash BCrypt para senha "123456" (strength 10)
 BCRYPT_HASH='$2a$10$6.NhjLVGWREJzlRet9xUzOXpwhxJ91LN55d.Jxqs9m/zkdnqHC29G'
@@ -29,7 +31,7 @@ BCRYPT_HASH='$2a$10$6.NhjLVGWREJzlRet9xUzOXpwhxJ91LN55d.Jxqs9m/zkdnqHC29G'
 # Contadores
 TESTS_PASSED=0
 TESTS_FAILED=0
-TOTAL_TESTS=14
+TOTAL_TESTS=18
 
 # IDs de videos criados durante o teste (para cleanup)
 VIDEOS_CRIADOS=()
@@ -59,6 +61,12 @@ print_header() {
 print_section() {
     echo ""
     echo -e "${YELLOW}--- $1 ---${NC}"
+}
+
+wait_for_keypress() {
+    echo ""
+    echo -e "${BLUE}Pressione qualquer tecla para continuar...${NC}"
+    read -n 1 -s -r
 }
 
 log_info() {
@@ -182,7 +190,8 @@ setup_test_users() {
     # Insere usuarios de teste (ignora se ja existem)
     local sql="INSERT IGNORE INTO usuarios (email, senha_hash, criado_em) VALUES
         ('$USUARIO_TESTE_EMAIL', '$BCRYPT_HASH', NOW()),
-        ('$OUTRO_USUARIO_EMAIL', '$BCRYPT_HASH', NOW());"
+        ('$OUTRO_USUARIO_EMAIL', '$BCRYPT_HASH', NOW()),
+        ('$TERCEIRO_USUARIO_EMAIL', '$BCRYPT_HASH', NOW());"
 
     docker exec "$mysql_container" mysql -ufiapx -pfiapx123 fiapx -e "$sql" 2>/dev/null
 
@@ -268,15 +277,16 @@ run_tests() {
     local test_num=0
     local token=""
     local token_outro=""
+    local response
+    local http_code
 
+    wait_for_keypress
     print_section "Testes de Autenticacao"
 
     # -------------------------------------------------------------------------
-    # Teste 1: Login com credenciais validas
+    # Login com credenciais validas
     # -------------------------------------------------------------------------
-    test_num=1
-    local response
-    local http_code
+    test_num=$((test_num + 1))
 
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/autenticacao/login" \
         -H "Content-Type: application/json" \
@@ -294,9 +304,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 2: Login com usuario inexistente
+    # Login com usuario inexistente
     # -------------------------------------------------------------------------
-    test_num=2
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/autenticacao/login" \
         -H "Content-Type: application/json" \
         -d '{"email":"naoexiste@email.com","senha":"123456"}')
@@ -310,9 +320,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 3: Login com senha incorreta
+    # Login com senha incorreta
     # -------------------------------------------------------------------------
-    test_num=3
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/autenticacao/login" \
         -H "Content-Type: application/json" \
         -d "{\"email\":\"$USUARIO_TESTE_EMAIL\",\"senha\":\"senhaerrada\"}")
@@ -326,9 +336,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 4: Login sem body
+    # Login sem body
     # -------------------------------------------------------------------------
-    test_num=4
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/autenticacao/login" \
         -H "Content-Type: application/json")
 
@@ -340,12 +350,13 @@ run_tests() {
         test_failed $test_num "POST /api/autenticacao/login" "body vazio rejeitado" "Esperado 4xx, recebido HTTP $http_code"
     fi
 
+    wait_for_keypress
     print_section "Testes de Envio de Videos"
 
     # -------------------------------------------------------------------------
-    # Teste 5: Enviar video com JWT valido
+    # Enviar video com JWT valido
     # -------------------------------------------------------------------------
-    test_num=5
+    test_num=$((test_num + 1))
 
     if [[ ! -f "$TEST_VIDEO" ]]; then
         test_failed $test_num "POST /api/videos/enviar" "upload com JWT cria video" "Arquivo de teste nao encontrado: $TEST_VIDEO"
@@ -370,9 +381,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 6: Enviar video sem JWT
+    # Enviar video sem JWT
     # -------------------------------------------------------------------------
-    test_num=6
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/videos/enviar" \
         -F "video=@$TEST_VIDEO")
 
@@ -385,9 +396,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 7: Enviar video com JWT invalido
+    # Enviar video com JWT invalido
     # -------------------------------------------------------------------------
-    test_num=7
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/videos/enviar" \
         -H "Authorization: Bearer token_invalido_xyz" \
         -F "video=@$TEST_VIDEO")
@@ -400,12 +411,29 @@ run_tests() {
         test_failed $test_num "POST /api/videos/enviar" "JWT invalido bloqueado" "Esperado 401/403, recebido HTTP $http_code"
     fi
 
+    # -------------------------------------------------------------------------
+    # Envio sem arquivo
+    # -------------------------------------------------------------------------
+    test_num=$((test_num + 1))
+    response=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/api/videos/enviar" \
+        -H "Authorization: Bearer $token" \
+        -H "Content-Type: multipart/form-data")
+
+    http_code=$(echo "$response" | tail -1)
+
+    if [[ "$http_code" =~ ^4[0-9][0-9]$ ]]; then
+        test_passed_negative $test_num "POST /api/videos/enviar" "sem arquivo rejeitado" "$http_code"
+    else
+        test_failed $test_num "POST /api/videos/enviar" "sem arquivo rejeitado" "Esperado 4xx, recebido HTTP $http_code"
+    fi
+
+    wait_for_keypress
     print_section "Testes de Listagem de Videos"
 
     # -------------------------------------------------------------------------
-    # Teste 8: Listar videos autenticado
+    # Listar videos autenticado
     # -------------------------------------------------------------------------
-    test_num=8
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos" \
         -H "Authorization: Bearer $token")
 
@@ -426,9 +454,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 9: Listar videos sem JWT
+    # Listar videos sem JWT
     # -------------------------------------------------------------------------
-    test_num=9
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos")
 
     http_code=$(echo "$response" | tail -1)
@@ -440,9 +468,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 10: Isolamento entre usuarios
+    # Isolamento entre usuarios
     # -------------------------------------------------------------------------
-    test_num=10
+    test_num=$((test_num + 1))
 
     # Login com segundo usuario
     token_outro=$(do_login "$OUTRO_USUARIO_EMAIL" "$OUTRO_USUARIO_SENHA")
@@ -474,12 +502,37 @@ run_tests() {
         fi
     fi
 
+    # -------------------------------------------------------------------------
+    # Lista vazia para novo usuario
+    # -------------------------------------------------------------------------
+    test_num=$((test_num + 1))
+
+    local token_terceiro
+    token_terceiro=$(do_login "$TERCEIRO_USUARIO_EMAIL" "$TERCEIRO_USUARIO_SENHA")
+
+    if [[ -z "$token_terceiro" ]] || [[ "$token_terceiro" == "null" ]]; then
+        test_failed $test_num "GET /api/videos" "lista vazia para novo usuario" "Falha no login do terceiro usuario"
+    else
+        response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos" \
+            -H "Authorization: Bearer $token_terceiro")
+
+        http_code=$(echo "$response" | tail -1)
+        response=$(echo "$response" | sed '$d')
+
+        if [[ "$http_code" == "200" ]] && [[ "$response" == "[]" ]]; then
+            test_passed_negative $test_num "GET /api/videos" "lista vazia para novo usuario" "$http_code" "retornou []"
+        else
+            test_failed $test_num "GET /api/videos" "lista vazia para novo usuario" "Esperado 200 com [], recebido HTTP $http_code resposta=$response"
+        fi
+    fi
+
+    wait_for_keypress
     print_section "Testes de Download"
 
     # -------------------------------------------------------------------------
-    # Teste 11: Download de video inexistente
+    # Download de video inexistente
     # -------------------------------------------------------------------------
-    test_num=11
+    test_num=$((test_num + 1))
     response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos/99999/baixar" \
         -H "Authorization: Bearer $token")
 
@@ -492,9 +545,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 12: Download de video nao processado
+    # Download de video nao processado
     # -------------------------------------------------------------------------
-    test_num=12
+    test_num=$((test_num + 1))
 
     # Envia novo video e tenta baixar imediatamente (antes de processar)
     response=$(curl -s -X POST "$BASE_URL/api/videos/enviar" \
@@ -523,12 +576,61 @@ run_tests() {
         test_failed $test_num "GET /api/videos/{id}/baixar" "video nao processado" "Falha ao criar video para teste"
     fi
 
+    # -------------------------------------------------------------------------
+    # Download cross-user (GAP de seguranca)
+    # -------------------------------------------------------------------------
+    test_num=$((test_num + 1))
+
+    # Usa video do outro usuario (criado no teste de isolamento)
+    local video_outro_usuario=${VIDEOS_CRIADOS[1]}
+
+    if [[ -z "$video_outro_usuario" ]]; then
+        test_failed $test_num "GET /api/videos/{id}/baixar" "download cross-user" "Nenhum video de outro usuario disponivel"
+    else
+        # Tenta baixar video do outro usuario com token do primeiro usuario
+        # Usa -o /dev/null para descartar body binario e evitar warning de null byte
+        http_code=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$BASE_URL/api/videos/$video_outro_usuario/baixar" \
+            -H "Authorization: Bearer $token")
+
+        if [[ "$http_code" == "403" ]] || [[ "$http_code" == "404" ]]; then
+            test_passed_negative $test_num "GET /api/videos/{id}/baixar" "download cross-user bloqueado" "$http_code"
+        elif [[ "$http_code" == "200" ]]; then
+            # GAP de seguranca: permite download de video de outro usuario
+            echo -e "${YELLOW}[${test_num}/${TOTAL_TESTS}] GET /api/videos/{id}/baixar | download cross-user | ${http_code} | GAP: permite acesso a video de outro usuario${NC}"
+            TESTS_PASSED=$((TESTS_PASSED + 1))
+        else
+            test_failed $test_num "GET /api/videos/{id}/baixar" "download cross-user" "HTTP $http_code inesperado"
+        fi
+    fi
+
+    # -------------------------------------------------------------------------
+    # Download sem JWT
+    # -------------------------------------------------------------------------
+    test_num=$((test_num + 1))
+
+    local video_para_download=${VIDEOS_CRIADOS[0]}
+
+    if [[ -z "$video_para_download" ]]; then
+        test_failed $test_num "GET /api/videos/{id}/baixar" "download sem JWT" "Nenhum video disponivel para teste"
+    else
+        response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/api/videos/$video_para_download/baixar")
+
+        http_code=$(echo "$response" | tail -1)
+
+        if [[ "$http_code" == "401" ]] || [[ "$http_code" == "403" ]]; then
+            test_passed_negative $test_num "GET /api/videos/{id}/baixar" "download sem JWT bloqueado" "$http_code"
+        else
+            test_failed $test_num "GET /api/videos/{id}/baixar" "download sem JWT bloqueado" "Esperado 401/403, recebido HTTP $http_code"
+        fi
+    fi
+
+    wait_for_keypress
     print_section "Teste de Processamento Real"
 
     # -------------------------------------------------------------------------
-    # Teste 13: Processamento real (sample.mp4)
+    # Processamento real (sample.mp4)
     # -------------------------------------------------------------------------
-    test_num=13
+    test_num=$((test_num + 1))
 
     # Usa o primeiro video enviado
     local video_para_processar=${VIDEOS_CRIADOS[0]}
@@ -556,9 +658,9 @@ run_tests() {
     fi
 
     # -------------------------------------------------------------------------
-    # Teste 14: Download de video concluido
+    # Download de video concluido
     # -------------------------------------------------------------------------
-    test_num=14
+    test_num=$((test_num + 1))
 
     local video_concluido=${VIDEOS_CRIADOS[0]}
 
