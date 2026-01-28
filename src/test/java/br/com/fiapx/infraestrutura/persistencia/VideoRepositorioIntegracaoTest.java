@@ -27,18 +27,19 @@ class VideoRepositorioIntegracaoTest {
 
     @Test
     void deveSalvarVideo() {
-        Video video = new Video("video.mp4", "/tmp/video.mp4");
+        Video video = new Video(1L, "video.mp4", "/tmp/video.mp4");
 
         Video salvo = videoRepositorio.salvar(video);
 
         assertNotNull(salvo.getId());
+        assertEquals(1L, salvo.getUsuarioId());
         assertEquals("video.mp4", salvo.getNomeOriginal());
         assertEquals(StatusVideo.PENDENTE, salvo.getStatus());
     }
 
     @Test
     void deveBuscarVideoPorId() {
-        Video video = new Video("video.mp4", "/tmp/video.mp4");
+        Video video = new Video(1L, "video.mp4", "/tmp/video.mp4");
         Video salvo = videoRepositorio.salvar(video);
 
         Optional<Video> encontrado = videoRepositorio.buscarPorId(salvo.getId());
@@ -49,8 +50,8 @@ class VideoRepositorioIntegracaoTest {
 
     @Test
     void deveListarTodosVideos() {
-        videoRepositorio.salvar(new Video("video1.mp4", "/tmp/video1.mp4"));
-        videoRepositorio.salvar(new Video("video2.mp4", "/tmp/video2.mp4"));
+        videoRepositorio.salvar(new Video(1L, "video1.mp4", "/tmp/video1.mp4"));
+        videoRepositorio.salvar(new Video(1L, "video2.mp4", "/tmp/video2.mp4"));
 
         List<Video> videos = videoRepositorio.listarTodos();
 
@@ -58,8 +59,21 @@ class VideoRepositorioIntegracaoTest {
     }
 
     @Test
+    void deveListarVideosPorUsuario() {
+        videoRepositorio.salvar(new Video(1L, "video1.mp4", "/tmp/video1.mp4"));
+        videoRepositorio.salvar(new Video(1L, "video2.mp4", "/tmp/video2.mp4"));
+        videoRepositorio.salvar(new Video(2L, "video3.mp4", "/tmp/video3.mp4"));
+
+        List<Video> videosUsuario1 = videoRepositorio.listarPorUsuarioId(1L);
+        List<Video> videosUsuario2 = videoRepositorio.listarPorUsuarioId(2L);
+
+        assertEquals(2, videosUsuario1.size());
+        assertEquals(1, videosUsuario2.size());
+    }
+
+    @Test
     void deveAtualizarStatusDoVideo() {
-        Video video = new Video("video.mp4", "/tmp/video.mp4");
+        Video video = new Video(1L, "video.mp4", "/tmp/video.mp4");
         Video salvo = videoRepositorio.salvar(video);
 
         salvo.marcarComoConcluido("/tmp/1.zip");

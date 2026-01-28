@@ -34,3 +34,6 @@ app:
   mensageria:
     fila-processamento: fila.video.processamento
     concorrencia: 3
+  jwt:
+    segredo: ${JWT_SEGREDO:chave-secreta-fiapx-video-processor-muito-segura-32chars}
+    expiracao-ms: ${JWT_EXPIRACAO_MS:86400000}

@@ -37,9 +37,18 @@ public class VideoRepositorioImpl implements VideoRepositorio {
                 .toList();
     }
 
+    @Override
+    public List<Video> listarPorUsuarioId(Long usuarioId) {
+        return jpaRepositorio.findByUsuarioIdOrderByCriadoEmDesc(usuarioId)
+                .stream()
+                .map(this::toDominio)
+                .toList();
+    }
+
     private VideoEntidade toEntidade(Video video) {
         VideoEntidade entidade = new VideoEntidade();
         entidade.setId(video.getId());
+        entidade.setUsuarioId(video.getUsuarioId());
         entidade.setNomeOriginal(video.getNomeOriginal());
         entidade.setStatus(video.getStatus());
         entidade.setCaminhoArquivo(video.getCaminhoArquivo());
@@ -54,6 +63,7 @@ public class VideoRepositorioImpl implements VideoRepositorio {
     private Video toDominio(VideoEntidade entidade) {
         Video video = new Video();
         video.setId(entidade.getId());
+        video.setUsuarioId(entidade.getUsuarioId());
         video.setNomeOriginal(entidade.getNomeOriginal());
         video.setStatus(entidade.getStatus());
         video.setCaminhoArquivo(entidade.getCaminhoArquivo());

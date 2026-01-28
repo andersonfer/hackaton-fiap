@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public class Video {
 
     private Long id;
+    private Long usuarioId;
     private String nomeOriginal;
     private StatusVideo status;
     private String caminhoArquivo;
@@ -25,6 +26,22 @@ public class Video {
         this.caminhoArquivo = caminhoArquivo;
         this.status = StatusVideo.PENDENTE;
         this.criadoEm = LocalDateTime.now();
+    }
+
+    public Video(Long usuarioId, String nomeOriginal, String caminhoArquivo) {
+        this.usuarioId = usuarioId;
+        this.nomeOriginal = nomeOriginal;
+        this.caminhoArquivo = caminhoArquivo;
+        this.status = StatusVideo.PENDENTE;
+        this.criadoEm = LocalDateTime.now();
+    }
+
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public Long getId() {

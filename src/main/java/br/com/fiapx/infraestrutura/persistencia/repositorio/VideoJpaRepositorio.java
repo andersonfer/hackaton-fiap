@@ -8,4 +8,6 @@ import java.util.List;
 public interface VideoJpaRepositorio extends JpaRepository<VideoEntidade, Long> {
 
     List<VideoEntidade> findAllByOrderByCriadoEmDesc();
+
+    List<VideoEntidade> findByUsuarioIdOrderByCriadoEmDesc(Long usuarioId);
 }

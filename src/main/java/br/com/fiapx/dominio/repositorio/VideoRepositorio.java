@@ -12,4 +12,6 @@ public interface VideoRepositorio {
     Optional<Video> buscarPorId(Long id);
 
     List<Video> listarTodos();
+
+    List<Video> listarPorUsuarioId(Long usuarioId);
 }

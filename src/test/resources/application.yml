@@ -24,3 +24,6 @@ app:
     habilitado: false
     fila-processamento: fila.video.processamento.test
     concorrencia: 1
+  jwt:
+    segredo: chave-secreta-fiapx-video-processor-teste-muito-segura
+    expiracao-ms: 86400000

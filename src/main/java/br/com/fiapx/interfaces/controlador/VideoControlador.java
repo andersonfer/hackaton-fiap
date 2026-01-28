@@ -4,10 +4,12 @@ import br.com.fiapx.aplicacao.casosdeuso.BaixarVideo;
 import br.com.fiapx.aplicacao.casosdeuso.EnviarVideo;
 import br.com.fiapx.aplicacao.casosdeuso.ListarVideos;
 import br.com.fiapx.dominio.entidade.Video;
+import br.com.fiapx.infraestrutura.seguranca.UsuarioAutenticado;
 import br.com.fiapx.interfaces.dto.resposta.VideoResposta;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,8 +31,11 @@ public class VideoControlador {
     }
 
     @PostMapping("/enviar")
-    public ResponseEntity<VideoResposta> enviar(@RequestParam("video") MultipartFile arquivo) throws IOException {
+    public ResponseEntity<VideoResposta> enviar(
+            @AuthenticationPrincipal UsuarioAutenticado usuario,
+            @RequestParam("video") MultipartFile arquivo) throws IOException {
         Video video = enviarVideo.executar(
+                usuario.id(),
                 arquivo.getOriginalFilename(),
                 arquivo.getInputStream()
         );
@@ -39,8 +44,8 @@ public class VideoControlador {
     }
 
     @GetMapping
-    public ResponseEntity<List<VideoResposta>> listar() {
-        List<VideoResposta> videos = listarVideos.executar()
+    public ResponseEntity<List<VideoResposta>> listar(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        List<VideoResposta> videos = listarVideos.executar(usuario.id())
                 .stream()
                 .map(VideoResposta::fromVideo)
                 .toList();

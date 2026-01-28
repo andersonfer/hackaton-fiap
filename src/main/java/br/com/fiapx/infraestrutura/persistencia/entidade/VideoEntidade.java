@@ -13,6 +13,9 @@ public class VideoEntidade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "usuario_id", nullable = false)
+    private Long usuarioId;
+
     @Column(name = "nome_original", nullable = false)
     private String nomeOriginal;
 
@@ -51,6 +54,14 @@ public class VideoEntidade {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public String getNomeOriginal() {

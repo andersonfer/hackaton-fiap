@@ -51,16 +51,18 @@ class EnviarVideoTest {
 
     @Test
     void deveEnviarVideoParaFilaComStatusPendente() {
+        Long usuarioId = 1L;
         String nomeArquivo = "video.mp4";
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
 
         when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
 
-        Video resultado = enviarVideo.executar(nomeArquivo, conteudo);
+        Video resultado = enviarVideo.executar(usuarioId, nomeArquivo, conteudo);
 
         assertNotNull(resultado);
         assertNotNull(resultado.getId());
+        assertEquals(usuarioId, resultado.getUsuarioId());
         assertEquals(nomeArquivo, resultado.getNomeOriginal());
         assertEquals(StatusVideo.PENDENTE, resultado.getStatus());
 
@@ -69,13 +71,14 @@ class EnviarVideoTest {
 
     @Test
     void deveSalvarVideoAntesDePublicarNaFila() {
+        Long usuarioId = 1L;
         String nomeArquivo = "video.mp4";
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
 
         when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
 
-        Video resultado = enviarVideo.executar(nomeArquivo, conteudo);
+        Video resultado = enviarVideo.executar(usuarioId, nomeArquivo, conteudo);
 
         verify(videoRepositorio).salvar(any(Video.class));
         verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());

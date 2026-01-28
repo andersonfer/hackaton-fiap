@@ -13,7 +13,7 @@ public class ListarVideos {
         this.videoRepositorio = videoRepositorio;
     }
 
-    public List<Video> executar() {
-        return videoRepositorio.listarTodos();
+    public List<Video> executar(Long usuarioId) {
+        return videoRepositorio.listarPorUsuarioId(usuarioId);
     }
 }

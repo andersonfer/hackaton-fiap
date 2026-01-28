@@ -24,15 +24,15 @@
 - [x] Retorno assincrono no envio
 - [x] Testes de integracao
 
-### ⏳ Git: Commit
-- [ ] Commit da Entrega 3 ← ATUAL
+### ✅ Entrega 4: Autenticacao JWT
+- [x] Entidade Usuario (pre-cadastrado via SQL)
+- [x] POST /api/autenticacao/login
+- [x] Spring Security + filtro JWT
+- [x] Filtrar videos por usuario
+- [x] Testes de autenticacao
 
-### ⏳ Entrega 4: Autenticacao JWT
-- [ ] Entidade Usuario (pre-cadastrado via SQL)
-- [ ] POST /api/autenticacao/login
-- [ ] Spring Security + filtro JWT
-- [ ] Filtrar videos por usuario
-- [ ] Testes de autenticacao
+### ⏳ Git: Commit
+- [ ] Commit da Entrega 4 ← ATUAL
 
 ### ⏳ Entrega 5: Kubernetes
 - [ ] Manifests k8s
