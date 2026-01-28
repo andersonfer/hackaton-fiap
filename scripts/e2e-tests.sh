@@ -31,7 +31,7 @@ BCRYPT_HASH='$2a$10$6.NhjLVGWREJzlRet9xUzOXpwhxJ91LN55d.Jxqs9m/zkdnqHC29G'
 # Contadores
 TESTS_PASSED=0
 TESTS_FAILED=0
-TOTAL_TESTS=18
+TOTAL_TESTS=19
 
 # IDs de videos criados durante o teste (para cleanup)
 VIDEOS_CRIADOS=()
@@ -259,12 +259,67 @@ wait_for_processing() {
     return 1
 }
 
+# Envia video e aguarda processamento (para uso em background)
+# Usa arquivo de token em vez de passar token diretamente (evita problemas de escape)
+enviar_e_aguardar_com_arquivo() {
+    local token_file=$1
+    local output_file=$2
+    local max_attempts=${3:-30}
+    local interval=${4:-1}
+
+    local token
+    token=$(cat "$token_file")
+
+    # Envia video
+    local response
+    response=$(curl -s -X POST "$BASE_URL/api/videos/enviar" \
+        -H "Authorization: Bearer $token" \
+        -F "video=@$TEST_VIDEO")
+
+    local video_id
+    if command -v jq &> /dev/null; then
+        video_id=$(echo "$response" | jq -r '.id' 2>/dev/null)
+    else
+        video_id=$(echo "$response" | grep -o '"id":[0-9]*' | cut -d: -f2 | head -1)
+    fi
+
+    if [[ -z "$video_id" ]] || [[ "$video_id" == "null" ]]; then
+        echo "ERRO:envio_falhou" > "$output_file"
+        return 1
+    fi
+
+    # Aguarda processamento (polling simplificado)
+    local status=""
+    local attempt=0
+    while [[ $attempt -lt $max_attempts ]]; do
+        local list_response
+        list_response=$(curl -s "$BASE_URL/api/videos" -H "Authorization: Bearer $token")
+
+        if command -v jq &> /dev/null; then
+            status=$(echo "$list_response" | jq -r ".[] | select(.id == $video_id) | .status" 2>/dev/null)
+        else
+            status=$(echo "$list_response" | grep -o "\"id\":$video_id[^}]*\"status\":\"[^\"]*\"" | grep -o '"status":"[^"]*"' | cut -d'"' -f4 | head -1)
+        fi
+
+        if [[ "$status" == "CONCLUIDO" ]] || [[ "$status" == "FALHA" ]]; then
+            echo "$video_id:$status" > "$output_file"
+            return 0
+        fi
+
+        attempt=$((attempt + 1))
+        sleep "$interval"
+    done
+
+    echo "$video_id:TIMEOUT" > "$output_file"
+}
+
 # Limpa dados de teste
 cleanup() {
     log_info "Limpando dados de teste..."
 
     # Remove arquivos temporarios de download
     rm -f /tmp/test_download_*.zip 2>/dev/null
+    rm -f /tmp/parallel_test_*_$$ 2>/dev/null
 
     log_success "Limpeza concluida"
 }
@@ -623,6 +678,98 @@ run_tests() {
             test_failed $test_num "GET /api/videos/{id}/baixar" "download sem JWT bloqueado" "Esperado 401/403, recebido HTTP $http_code"
         fi
     fi
+
+    wait_for_keypress
+    print_section "Teste de Processamento Paralelo"
+
+    # -------------------------------------------------------------------------
+    # Envia 3 videos simultaneamente e verifica processamento
+    # Nota: Para demonstracao visual de paralelismo real, use ./scripts/test-parallel.sh
+    # -------------------------------------------------------------------------
+    test_num=$((test_num + 1))
+
+    log_info "Enviando 3 videos simultaneamente para teste de paralelismo..."
+
+    # Obtem tokens frescos
+    local token_paralelo1=$(do_login "$USUARIO_TESTE_EMAIL" "$USUARIO_TESTE_SENHA")
+    local token_paralelo2=$(do_login "$OUTRO_USUARIO_EMAIL" "$OUTRO_USUARIO_SENHA")
+    local token_paralelo3=$(do_login "$TERCEIRO_USUARIO_EMAIL" "$TERCEIRO_USUARIO_SENHA")
+
+    if [[ -z "$token_paralelo1" ]] || [[ "$token_paralelo1" == "null" ]] || \
+       [[ -z "$token_paralelo2" ]] || [[ "$token_paralelo2" == "null" ]] || \
+       [[ -z "$token_paralelo3" ]] || [[ "$token_paralelo3" == "null" ]]; then
+        test_failed $test_num "Processamento Paralelo" "3 videos em paralelo" "Falha ao obter tokens dos usuarios"
+    else
+
+    # Captura tempo inicial
+    local start_time_parallel=$(date +%s)
+
+    # Envia 3 videos rapidamente (quase simultaneamente)
+    local resp1=$(curl -s -X POST "$BASE_URL/api/videos/enviar" \
+        -H "Authorization: Bearer $token_paralelo1" \
+        -F "video=@$TEST_VIDEO")
+    local id1=$(json_number "$resp1" "id")
+
+    local resp2=$(curl -s -X POST "$BASE_URL/api/videos/enviar" \
+        -H "Authorization: Bearer $token_paralelo2" \
+        -F "video=@$TEST_VIDEO")
+    local id2=$(json_number "$resp2" "id")
+
+    local resp3=$(curl -s -X POST "$BASE_URL/api/videos/enviar" \
+        -H "Authorization: Bearer $token_paralelo3" \
+        -F "video=@$TEST_VIDEO")
+    local id3=$(json_number "$resp3" "id")
+
+    log_info "Videos enviados: $id1, $id2, $id3. Aguardando processamento..."
+
+    if [[ -n "$id1" ]] && [[ "$id1" != "null" ]]; then VIDEOS_CRIADOS+=("$id1"); fi
+    if [[ -n "$id2" ]] && [[ "$id2" != "null" ]]; then VIDEOS_CRIADOS+=("$id2"); fi
+    if [[ -n "$id3" ]] && [[ "$id3" != "null" ]]; then VIDEOS_CRIADOS+=("$id3"); fi
+
+    # Aguarda todos serem processados (polling simples)
+    local todos_prontos=false
+    local status1="" status2="" status3=""
+
+    for attempt in $(seq 1 30); do
+        status1=$(get_video_status "$id1" "$token_paralelo1")
+        status2=$(get_video_status "$id2" "$token_paralelo2")
+        status3=$(get_video_status "$id3" "$token_paralelo3")
+
+        local count_prontos=0
+        [[ "$status1" == "CONCLUIDO" || "$status1" == "FALHA" ]] && count_prontos=$((count_prontos + 1))
+        [[ "$status2" == "CONCLUIDO" || "$status2" == "FALHA" ]] && count_prontos=$((count_prontos + 1))
+        [[ "$status3" == "CONCLUIDO" || "$status3" == "FALHA" ]] && count_prontos=$((count_prontos + 1))
+
+        if [[ $count_prontos -eq 3 ]]; then
+            todos_prontos=true
+            break
+        fi
+        sleep 1
+    done
+
+    # Captura tempo final
+    local end_time_parallel=$(date +%s)
+    local elapsed_parallel=$((end_time_parallel - start_time_parallel))
+
+    # Verifica resultados
+    local detalhes_status="id1=$id1:$status1 id2=$id2:$status2 id3=$id3:$status3"
+
+    if [[ "$todos_prontos" == "true" ]] && \
+       [[ "$status1" == "CONCLUIDO" ]] && \
+       [[ "$status2" == "CONCLUIDO" ]] && \
+       [[ "$status3" == "CONCLUIDO" ]]; then
+        # Se todos concluiram em menos de 15s, indica processamento paralelo
+        if [[ "$elapsed_parallel" -lt 15 ]]; then
+            test_passed $test_num "Processamento Paralelo" "3 videos processados" "OK" "${elapsed_parallel}s (< 15s indica paralelismo)"
+        else
+            echo -e "${YELLOW}[${test_num}/${TOTAL_TESTS}] Processamento Paralelo | 3 videos | ${elapsed_parallel}s | AVISO: tempo alto${NC}"
+            TESTS_PASSED=$((TESTS_PASSED + 1))
+        fi
+    else
+        test_failed $test_num "Processamento Paralelo" "3 videos processados" "Nem todos concluiram: $detalhes_status (${elapsed_parallel}s)"
+    fi
+
+    fi  # fecha o if dos tokens
 
     wait_for_keypress
     print_section "Teste de Processamento Real"
