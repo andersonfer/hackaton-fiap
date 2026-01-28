@@ -11,15 +11,14 @@
 - [x] Docker Compose basico
 - [x] Testes unitarios dos casos de uso
 
-### 🔄 Git: Inicializar Repositorio
-- [x] Criar .gitignore
-- [ ] Primeiro commit ← ATUAL
+### ✅ Entrega 2: Persistencia + Listagem
+- [x] MySQL no Docker Compose
+- [x] Entidades JPA e repositorios
+- [x] GET /api/videos (listagem)
+- [x] Testes de integracao
 
-### ⏳ Entrega 2: Persistencia + Listagem
-- [ ] MySQL no Docker Compose
-- [ ] Entidades JPA e repositorios
-- [ ] GET /api/videos (listagem)
-- [ ] Testes de integracao
+### ⏳ Git: Commit
+- [ ] Commit da Entrega 2 ← ATUAL
 
 ### ⏳ Entrega 3: Processamento Assincrono
 - [ ] RabbitMQ no Docker Compose

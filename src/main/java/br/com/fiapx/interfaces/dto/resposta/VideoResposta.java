@@ -3,12 +3,15 @@ package br.com.fiapx.interfaces.dto.resposta;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.enums.StatusVideo;
 
+import java.time.LocalDateTime;
+
 public record VideoResposta(
         Long id,
         String nomeOriginal,
         StatusVideo status,
         String urlDownload,
-        String mensagemErro
+        String mensagemErro,
+        LocalDateTime criadoEm
 ) {
     public static VideoResposta fromVideo(Video video) {
         String urlDownload = null;
@@ -21,7 +24,8 @@ public record VideoResposta(
                 video.getNomeOriginal(),
                 video.getStatus(),
                 urlDownload,
-                video.getMensagemErro()
+                video.getMensagemErro(),
+                video.getCriadoEm()
         );
     }
 }

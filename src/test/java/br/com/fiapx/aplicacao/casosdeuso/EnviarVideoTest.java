@@ -4,6 +4,7 @@ import br.com.fiapx.aplicacao.gateway.ArmazenamentoArquivoGateway;
 import br.com.fiapx.aplicacao.gateway.ProcessadorVideoGateway;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.enums.StatusVideo;
+import br.com.fiapx.dominio.repositorio.VideoRepositorio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,11 +30,22 @@ class EnviarVideoTest {
     @Mock
     private ProcessadorVideoGateway processadorGateway;
 
+    @Mock
+    private VideoRepositorio videoRepositorio;
+
     private EnviarVideo enviarVideo;
 
     @BeforeEach
     void setUp() {
-        enviarVideo = new EnviarVideo(armazenamentoGateway, processadorGateway);
+        enviarVideo = new EnviarVideo(armazenamentoGateway, processadorGateway, videoRepositorio);
+
+        when(videoRepositorio.salvar(any(Video.class))).thenAnswer(invocation -> {
+            Video video = invocation.getArgument(0);
+            if (video.getId() == null) {
+                video.setId(1L);
+            }
+            return video;
+        });
     }
 
     @Test

@@ -1,30 +1,48 @@
-package br.com.fiapx.dominio.entidade;
+package br.com.fiapx.infraestrutura.persistencia.entidade;
 
 import br.com.fiapx.dominio.enums.StatusVideo;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-public class Video {
+@Entity
+@Table(name = "videos")
+public class VideoEntidade {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "nome_original", nullable = false)
     private String nomeOriginal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusVideo status;
+
+    @Column(name = "caminho_arquivo")
     private String caminhoArquivo;
+
+    @Column(name = "caminho_zip")
     private String caminhoZip;
+
+    @Column(name = "mensagem_erro", columnDefinition = "TEXT")
     private String mensagemErro;
+
+    @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
+
+    @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
-    public Video() {
-        this.status = StatusVideo.PENDENTE;
+    public VideoEntidade() {
         this.criadoEm = LocalDateTime.now();
+        this.status = StatusVideo.PENDENTE;
     }
 
-    public Video(String nomeOriginal, String caminhoArquivo) {
-        this.nomeOriginal = nomeOriginal;
-        this.caminhoArquivo = caminhoArquivo;
-        this.status = StatusVideo.PENDENTE;
-        this.criadoEm = LocalDateTime.now();
+    @PreUpdate
+    public void preUpdate() {
+        this.atualizadoEm = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -72,20 +90,6 @@ public class Video {
     }
 
     public void setMensagemErro(String mensagemErro) {
-        this.mensagemErro = mensagemErro;
-    }
-
-    public void marcarComoProcessando() {
-        this.status = StatusVideo.PROCESSANDO;
-    }
-
-    public void marcarComoConcluido(String caminhoZip) {
-        this.status = StatusVideo.CONCLUIDO;
-        this.caminhoZip = caminhoZip;
-    }
-
-    public void marcarComoFalha(String mensagemErro) {
-        this.status = StatusVideo.FALHA;
         this.mensagemErro = mensagemErro;
     }
 
