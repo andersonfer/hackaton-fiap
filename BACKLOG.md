@@ -42,6 +42,14 @@
   - ListarVideosTest (4 testes)
   - GAP documentado: Acesso cross-user no download (teste @Disabled)
 
+### ✅ Entrega 5b: Concorrencia On-Demand
+- [x] ConfiguracaoExecutor (ThreadPoolTaskExecutor elastico)
+- [x] OuvinteMensagemVideo delega ao executor (ack imediato)
+- [x] AgendadorReprocessamento (scheduler para videos travados)
+- [x] Metodo buscarPorStatusEAtualizadoAntesDe no repositorio
+- [x] Testes unitarios do AgendadorReprocessamento (4 testes)
+- [x] application.yml: concorrencia=1, config reprocessamento
+
 ### ⏳ Entrega 6: CI/CD + Documentacao
 - [ ] GitHub Actions pipeline (build, test, docker)
 - [ ] README completo com instrucoes

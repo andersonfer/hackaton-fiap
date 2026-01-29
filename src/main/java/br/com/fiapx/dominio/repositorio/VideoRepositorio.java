@@ -1,7 +1,9 @@
 package br.com.fiapx.dominio.repositorio;
 
 import br.com.fiapx.dominio.entidade.Video;
+import br.com.fiapx.dominio.enums.StatusVideo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +16,6 @@ public interface VideoRepositorio {
     List<Video> listarTodos();
 
     List<Video> listarPorUsuarioId(Long usuarioId);
+
+    List<Video> buscarPorStatusEAtualizadoAntesDe(StatusVideo status, LocalDateTime limite);
 }

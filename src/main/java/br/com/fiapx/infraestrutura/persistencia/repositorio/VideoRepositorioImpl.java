@@ -1,10 +1,12 @@
 package br.com.fiapx.infraestrutura.persistencia.repositorio;
 
 import br.com.fiapx.dominio.entidade.Video;
+import br.com.fiapx.dominio.enums.StatusVideo;
 import br.com.fiapx.dominio.repositorio.VideoRepositorio;
 import br.com.fiapx.infraestrutura.persistencia.entidade.VideoEntidade;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,14 @@ public class VideoRepositorioImpl implements VideoRepositorio {
     @Override
     public List<Video> listarPorUsuarioId(Long usuarioId) {
         return jpaRepositorio.findByUsuarioIdOrderByCriadoEmDesc(usuarioId)
+                .stream()
+                .map(this::toDominio)
+                .toList();
+    }
+
+    @Override
+    public List<Video> buscarPorStatusEAtualizadoAntesDe(StatusVideo status, LocalDateTime limite) {
+        return jpaRepositorio.findByStatusAndAtualizadoEmBefore(status, limite)
                 .stream()
                 .map(this::toDominio)
                 .toList();
