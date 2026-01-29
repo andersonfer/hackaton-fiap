@@ -4,7 +4,6 @@ import br.com.fiapx.aplicacao.gateway.ProcessadorVideoGateway;
 import br.com.fiapx.dominio.entidade.Video;
 import br.com.fiapx.dominio.enums.StatusVideo;
 import br.com.fiapx.dominio.repositorio.VideoRepositorio;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
@@ -67,7 +66,6 @@ class ProcessamentoParaleloIntegracaoTest {
         registry.add("spring.rabbitmq.username", () -> "guest");
         registry.add("spring.rabbitmq.password", () -> "guest");
         registry.add("app.mensageria.habilitado", () -> "true");
-        registry.add("app.mensageria.concorrencia", () -> "3");
         registry.add("app.mensageria.fila-processamento", () -> "fila.video.processamento.test");
         // Desabilita autoconfiguracao exclusion do application-test.yml
         registry.add("spring.autoconfigure.exclude", () -> "");
@@ -150,70 +148,6 @@ class ProcessamentoParaleloIntegracaoTest {
         assertThat(maxProcessamentosSimultaneos.get())
                 .as("Deve ter pelo menos 2 processamentos simultaneos")
                 .isGreaterThanOrEqualTo(2);
-    }
-
-    @Test
-    void deveProcessar6VideosRespeitandoConcorrencia3() throws Exception {
-        // Arrange: criar 6 videos PENDENTE
-        Video video1 = criarVideo("video1.mp4");
-        Video video2 = criarVideo("video2.mp4");
-        Video video3 = criarVideo("video3.mp4");
-        Video video4 = criarVideo("video4.mp4");
-        Video video5 = criarVideo("video5.mp4");
-        Video video6 = criarVideo("video6.mp4");
-
-        // Mock do processador que simula processamento de 300ms
-        when(processadorGateway.processarVideo(any(Path.class), anyLong()))
-                .thenAnswer(invocation -> {
-                    int atual = processamentosSimultaneos.incrementAndGet();
-                    maxProcessamentosSimultaneos.updateAndGet(max -> Math.max(max, atual));
-
-                    try {
-                        Thread.sleep(300);
-                    } finally {
-                        processamentosSimultaneos.decrementAndGet();
-                    }
-
-                    Long videoId = invocation.getArgument(1);
-                    return Paths.get("/tmp/fiapx-test/zips/" + videoId + ".zip");
-                });
-
-        // Act: publicar 6 mensagens
-        long inicio = System.currentTimeMillis();
-
-        publicadorMensagemVideo.publicar(video1.getId(), video1.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video2.getId(), video2.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video3.getId(), video3.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video4.getId(), video4.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video5.getId(), video5.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video6.getId(), video6.getCaminhoArquivo());
-
-        // Aguarda processamento
-        await().atMost(Duration.ofSeconds(15))
-                .pollInterval(Duration.ofMillis(200))
-                .until(() -> todosProcessados(
-                        video1.getId(), video2.getId(), video3.getId(),
-                        video4.getId(), video5.getId(), video6.getId()));
-
-        long duracao = System.currentTimeMillis() - inicio;
-
-        // Assert: todos CONCLUIDO
-        assertThat(videoRepositorio.buscarPorId(video1.getId()).get().getStatus())
-                .isEqualTo(StatusVideo.CONCLUIDO);
-        assertThat(videoRepositorio.buscarPorId(video6.getId()).get().getStatus())
-                .isEqualTo(StatusVideo.CONCLUIDO);
-
-        // 6 videos de 300ms com concorrencia 3 = 2 lotes = ~600ms
-        // Sequencial seria ~1800ms
-        // Com margem: < 1200ms indica paralelismo
-        assertThat(duracao)
-                .as("6 videos devem processar em ~2 lotes paralelos")
-                .isLessThan(1200);
-
-        // Verifica que concorrencia maxima foi 3 (ou proximo)
-        assertThat(maxProcessamentosSimultaneos.get())
-                .as("Concorrencia maxima deve ser 3")
-                .isLessThanOrEqualTo(3);
     }
 
     private Video criarVideo(String nomeOriginal) {

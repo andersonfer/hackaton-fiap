@@ -78,7 +78,7 @@
 - [ ] Configurar trace viewer para debug de falhas
 - [ ] Avaliar ganho de performance e estabilidade vs Selenium
 
-### ⏳ Entrega 6: CI/CD + Documentacao
+### ⏳ Entrega 6: CI/CD + Documentacao ← ATUAL
 - [ ] GitHub Actions pipeline (build, test, docker)
 - [ ] README completo com instrucoes
 - [ ] Documentacao da arquitetura (diagrama)
@@ -120,3 +120,14 @@
 - [ ] Mover validacao de limite de arquivos do `VideoControlador` para caso de uso
 - [ ] Criar excecao `ValidacaoException` em `dominio/excecao/`
 - [ ] Adicionar testes para cada validacao
+
+### ⏳ Entrega 12: Cancelamento de Processamento (OPCIONAL)
+- [ ] Novo status CANCELADO no enum StatusVideo
+- [ ] Remover shell intermediario (sh -c) do ProcessadorVideoFFmpeg para destroy() confiavel
+- [ ] Armazenar referencia ao Process por videoId (ConcurrentHashMap)
+- [ ] Trocar waitFor() por loop com polling e verificacao de interrupcao
+- [ ] Metodo cancelar(videoId) no ProcessadorVideoFFmpeg e na interface gateway
+- [ ] Caso de uso CancelarVideo (orquestra cancelamento, cleanup de arquivos, atualiza status)
+- [ ] Endpoint POST /api/videos/{id}/cancelar no VideoControlador
+- [ ] Nao reprocessar videos com status CANCELADO no AgendadorReprocessamento
+- [ ] Testes unitarios do cancelamento

@@ -24,7 +24,7 @@ public class OuvinteMensagemVideo {
         this.executorProcessamento = executorProcessamento;
     }
 
-    @RabbitListener(queues = "${app.mensageria.fila-processamento}", concurrency = "${app.mensageria.concorrencia}")
+    @RabbitListener(queues = "${app.mensageria.fila-processamento}")
     public void processar(MensagemProcessamentoVideo mensagem) {
         log.info("Recebida mensagem para processar video: {}. Delegando ao executor.", mensagem.videoId());
         executorProcessamento.execute(() -> {

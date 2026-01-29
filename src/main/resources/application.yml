@@ -33,7 +33,6 @@ app:
     diretorio-zips: ${DIRETORIO_ZIPS:/tmp/fiapx/zips}
   mensageria:
     fila-processamento: fila.video.processamento
-    concorrencia: 1
   reprocessamento:
     intervalo-ms: 60000
     timeout-minutos: 5
