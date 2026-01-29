@@ -77,3 +77,29 @@
   - Arquivo: BaixarVideo.java e/ou VideoControlador.java
   - Verificar se video.usuarioId == usuarioAutenticado.id antes de permitir download
   - Habilitar teste: VideoControladorTest.deveNegarAcessoAoBaixarVideoDeOutroUsuario()
+
+### ⏳ Entrega 9: Refatorar Excecoes
+- [ ] Mover `CredenciaisInvalidasException` para `dominio/excecao/`
+- [ ] Criar `ProcessamentoVideoException` para erros de processamento FFmpeg
+- [ ] Criar `ArmazenamentoException` para erros de I/O no armazenamento
+- [ ] Substituir `RuntimeException` generico nos pontos identificados
+  - ProcessarVideo.java (video nao encontrado, falha processamento)
+  - ProcessadorVideoFFmpeg.java (erro ffmpeg, erro zip)
+  - ArmazenamentoArquivoLocal.java (erro salvar, ler, deletar)
+- [ ] Adicionar handlers no `TratadorGlobalExcecoes`
+- [ ] Atualizar testes afetados
+
+### ⏳ Entrega 10: Rever Separacao entre Camadas
+- [ ] Remover `@Service` de `AutenticarUsuario` e `RegistrarUsuario`
+- [ ] Registrar ambos como `@Bean` em `ConfiguracaoCasosDeUso`
+- [ ] Criar `GeradorTokenGateway` (interface na aplicacao) + implementacao na infraestrutura
+- [ ] Criar `CodificadorSenhaGateway` (interface na aplicacao) + implementacao na infraestrutura
+- [ ] Atualizar testes afetados
+
+### ⏳ Entrega 11: Separar Validacao nos Casos de Uso
+- [ ] Adicionar validacao de entrada em `EnviarVideo` (usuarioId, nomeArquivo, conteudo nao nulos)
+- [ ] Adicionar validacao de entrada em `RegistrarUsuario` (email formato, senha tamanho minimo)
+- [ ] Adicionar validacao de entrada em `AutenticarUsuario` (email e senha nao vazios)
+- [ ] Mover validacao de limite de arquivos do `VideoControlador` para caso de uso
+- [ ] Criar excecao `ValidacaoException` em `dominio/excecao/`
+- [ ] Adicionar testes para cada validacao
