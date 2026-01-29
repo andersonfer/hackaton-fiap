@@ -54,8 +54,10 @@ public class VideoControlador {
     }
 
     @GetMapping("/{id}/baixar")
-    public ResponseEntity<byte[]> baixar(@PathVariable Long id) {
-        byte[] conteudo = baixarVideo.executar(id);
+    public ResponseEntity<byte[]> baixar(
+            @AuthenticationPrincipal UsuarioAutenticado usuario,
+            @PathVariable Long id) {
+        byte[] conteudo = baixarVideo.executar(id, usuario.id());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

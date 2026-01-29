@@ -29,8 +29,9 @@ public class ConfiguracaoCasosDeUso {
     }
 
     @Bean
-    public BaixarVideo baixarVideo(ArmazenamentoArquivoGateway armazenamentoGateway) {
-        return new BaixarVideo(armazenamentoGateway);
+    public BaixarVideo baixarVideo(ArmazenamentoArquivoGateway armazenamentoGateway,
+                                   VideoRepositorio videoRepositorio) {
+        return new BaixarVideo(armazenamentoGateway, videoRepositorio);
     }
 
     @Bean

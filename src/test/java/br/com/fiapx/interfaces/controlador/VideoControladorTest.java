@@ -287,7 +287,6 @@ class VideoControladorTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("GAP DE SEGURANCA: Implementacao atual permite acesso cross-user. TODO: Corrigir BaixarVideo/VideoControlador para validar usuario")
     void deveNegarAcessoAoBaixarVideoDeOutroUsuario() throws IOException {
         VideoEntidade video = criarVideoConcluidoComZip(usuarioId2, "video-outro-usuario.mp4");
 

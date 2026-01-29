@@ -31,7 +31,7 @@ BCRYPT_HASH='$2a$10$6.NhjLVGWREJzlRet9xUzOXpwhxJ91LN55d.Jxqs9m/zkdnqHC29G'
 # Contadores
 TESTS_PASSED=0
 TESTS_FAILED=0
-TOTAL_TESTS=$(grep -c 'test_num=$((test_num + 1))' "${BASH_SOURCE[0]}")
+TOTAL_TESTS=$(( $(grep -c 'test_num=$((test_num + 1))' "${BASH_SOURCE[0]}") - 1 ))
 
 # IDs de videos criados durante o teste (para cleanup)
 VIDEOS_CRIADOS=()
@@ -625,12 +625,8 @@ run_tests() {
 
         if [[ "$http_code" == "403" ]] || [[ "$http_code" == "404" ]]; then
             test_passed_negative $test_num "GET /api/videos/{id}/baixar" "download cross-user bloqueado" "$http_code"
-        elif [[ "$http_code" == "200" ]]; then
-            # GAP de seguranca: permite download de video de outro usuario
-            echo -e "${YELLOW}[${test_num}/${TOTAL_TESTS}] GET /api/videos/{id}/baixar | download cross-user | ${http_code} | GAP: permite acesso a video de outro usuario${NC}"
-            TESTS_PASSED=$((TESTS_PASSED + 1))
         else
-            test_failed $test_num "GET /api/videos/{id}/baixar" "download cross-user" "HTTP $http_code inesperado"
+            test_failed $test_num "GET /api/videos/{id}/baixar" "download cross-user bloqueado" "Esperado 403/404, recebido HTTP $http_code"
         fi
     fi
 
