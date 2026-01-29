@@ -61,6 +61,23 @@
 - [x] Auto-refresh da lista de videos (polling 5s)
 - [x] Download de ZIP com autenticacao via JWT
 
+### ⏳ Entrega 5d: Testes E2E de UI com Selenium
+- [ ] Adicionar dependencias (selenium-java, webdrivermanager) no pom.xml
+- [ ] Criar classe base de teste Selenium com setup/teardown do WebDriver
+- [ ] Teste E2E: fluxo de login (login valido, credenciais invalidas)
+- [ ] Teste E2E: fluxo de registro de usuario
+- [ ] Teste E2E: upload de video via UI (drag-and-drop ou file input)
+- [ ] Teste E2E: listagem de videos e verificacao de status
+- [ ] Teste E2E: download de ZIP via UI
+- [ ] Teste E2E: fluxo completo (login → upload → aguardar processamento → download)
+- [ ] Configurar execucao headless para CI
+
+### ⏳ Entrega 5e: Migrar Testes E2E de UI para Playwright (OPCIONAL)
+- [ ] Substituir Selenium por Playwright Java (com.microsoft.playwright)
+- [ ] Reescrever testes aproveitando auto-wait e locators modernos
+- [ ] Configurar trace viewer para debug de falhas
+- [ ] Avaliar ganho de performance e estabilidade vs Selenium
+
 ### ⏳ Entrega 6: CI/CD + Documentacao
 - [ ] GitHub Actions pipeline (build, test, docker)
 - [ ] README completo com instrucoes
