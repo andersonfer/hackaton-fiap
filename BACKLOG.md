@@ -50,6 +50,16 @@
 - [x] Testes unitarios do AgendadorReprocessamento (4 testes)
 - [x] application.yml: concorrencia=1, config reprocessamento
 
+### ✅ Entrega 5c: Interface Grafica (Frontend)
+- [x] Tela de Login (login.html)
+- [x] Tela Meus Videos (index.html) - upload, listagem, download
+- [x] CSS (estilo.css) - design responsivo
+- [x] Endpoint de envio em lote (POST /api/videos/enviar-lote)
+- [x] Liberacao de recursos estaticos no Spring Security
+- [x] Upload de ate 5 videos por vez com drag-and-drop
+- [x] Auto-refresh da lista de videos (polling 5s)
+- [x] Download de ZIP com autenticacao via JWT
+
 ### ⏳ Entrega 6: CI/CD + Documentacao
 - [ ] GitHub Actions pipeline (build, test, docker)
 - [ ] README completo com instrucoes

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FIAP X</title>
+    <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h1>FIAP X</h1>
+            <p class="subtitulo">Processador de Videos</p>
+
+            <div id="mensagemErro" class="mensagem-erro"></div>
+
+            <form id="formLogin" autocomplete="on">
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required
+                           placeholder="seu@email.com" autocomplete="email">
+                </div>
+
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required
+                           placeholder="Sua senha" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primario" id="btnEntrar">
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

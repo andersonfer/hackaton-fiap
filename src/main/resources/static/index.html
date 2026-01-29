@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Videos - FIAP X</title>
+    <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+    <!-- Cabecalho -->
+    <header class="cabecalho">
+        <span class="cabecalho-titulo">FIAP X</span>
+        <div class="cabecalho-usuario">
+            <span class="cabecalho-email" id="emailUsuario"></span>
+            <button class="btn-sair" id="btnSair">Sair</button>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <!-- Painel de upload -->
+        <section class="painel">
+            <h2>Enviar videos</h2>
+
+            <div class="zona-upload" id="zonaUpload">
+                <input type="file" id="inputArquivos" multiple accept="video/*">
+                <div class="zona-upload-icone">&#127916;</div>
+                <div class="zona-upload-texto">
+                    <strong>Clique para selecionar</strong> ou arraste os arquivos aqui
+                </div>
+                <div class="zona-upload-dica">Ate 5 videos por envio</div>
+            </div>
+
+            <div class="arquivos-selecionados" id="arquivosSelecionados">
+                <div id="listaArquivos"></div>
+                <div class="upload-acoes">
+                    <span id="contadorArquivos" style="font-size:0.8125rem;color:var(--cor-texto-secundario)"></span>
+                    <button class="btn btn-primario" id="btnEnviar" disabled>
+                        Enviar
+                    </button>
+                </div>
+            </div>
+
+            <div class="upload-progresso" id="progressoUpload">
+                <div class="barra-progresso">
+                    <div class="barra-progresso-preenchimento" id="barraProgresso"></div>
+                </div>
+                <div class="upload-texto-progresso" id="textoProgresso">Enviando...</div>
+            </div>
+
+            <div id="mensagemErroUpload" class="mensagem-erro" style="margin-top:1rem"></div>
+        </section>
+
+        <!-- Painel de videos -->
+        <section class="painel">
+            <h2>Meus videos</h2>
+
+            <div class="tabela-container">
+                <table id="tabelaVideos">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Status</th>
+                            <th>Data de envio</th>
+                            <th>Acao</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="vazio" id="mensagemVazia" style="display:none">
+                <div class="vazio-icone">&#128249;</div>
+                <p>Nenhum video enviado ainda.</p>
+            </div>
+
+            <div class="auto-atualizacao">
+                <span class="auto-atualizacao-ponto"></span>
+                Atualizacao automatica a cada 5 segundos
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

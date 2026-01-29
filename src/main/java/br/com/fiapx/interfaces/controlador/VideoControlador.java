@@ -43,6 +43,27 @@ public class VideoControlador {
         return ResponseEntity.ok(VideoResposta.fromVideo(video));
     }
 
+    @PostMapping("/enviar-lote")
+    public ResponseEntity<List<VideoResposta>> enviarLote(
+            @AuthenticationPrincipal UsuarioAutenticado usuario,
+            @RequestParam("videos") List<MultipartFile> arquivos) throws IOException {
+        if (arquivos.size() > 5) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<VideoResposta> respostas = new java.util.ArrayList<>();
+        for (MultipartFile arquivo : arquivos) {
+            Video video = enviarVideo.executar(
+                    usuario.id(),
+                    arquivo.getOriginalFilename(),
+                    arquivo.getInputStream()
+            );
+            respostas.add(VideoResposta.fromVideo(video));
+        }
+
+        return ResponseEntity.ok(respostas);
+    }
+
     @GetMapping
     public ResponseEntity<List<VideoResposta>> listar(@AuthenticationPrincipal UsuarioAutenticado usuario) {
         List<VideoResposta> videos = listarVideos.executar(usuario.id())

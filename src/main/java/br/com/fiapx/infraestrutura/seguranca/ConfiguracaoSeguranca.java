@@ -28,6 +28,7 @@ public class ConfiguracaoSeguranca {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/autenticacao/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login.html", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(filtroAutenticacaoJwt, UsernamePasswordAuthenticationFilter.class)
