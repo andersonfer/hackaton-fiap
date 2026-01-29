@@ -61,8 +61,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function adicionarArquivos(novos) {
+        var ignorados = 0;
         for (var i = 0; i < novos.length; i++) {
-            if (arquivosParaEnviar.length >= 5) break;
+            if (arquivosParaEnviar.length >= 5) {
+                ignorados += novos.length - i;
+                break;
+            }
             // Evitar duplicatas pelo nome
             var duplicado = false;
             for (var j = 0; j < arquivosParaEnviar.length; j++) {
@@ -76,6 +80,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         renderizarArquivosSelecionados();
+        if (ignorados > 0) {
+            mostrarErroUpload('Limite de 5 videos por envio. ' + ignorados + (ignorados === 1 ? ' arquivo foi ignorado.' : ' arquivos foram ignorados.'));
+        }
     }
 
     function removerArquivo(index) {
