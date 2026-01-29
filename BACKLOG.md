@@ -27,6 +27,7 @@
 ### ✅ Entrega 4: Autenticacao JWT
 - [x] Entidade Usuario (pre-cadastrado via SQL)
 - [x] POST /api/autenticacao/login
+- [x] POST /api/autenticacao/registrar (cadastro de usuario)
 - [x] Spring Security + filtro JWT
 - [x] Filtrar videos por usuario
 - [x] Testes de autenticacao

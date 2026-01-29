@@ -159,6 +159,38 @@ body {
     display: block;
 }
 
+.mensagem-sucesso {
+    background-color: var(--cor-sucesso-fundo);
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.mensagem-sucesso.visivel {
+    display: block;
+}
+
+.link-alternar {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--cor-texto-secundario);
+}
+
+.link-alternar a {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-alternar a:hover {
+    text-decoration: underline;
+}
+
 /* Header */
 .cabecalho {
     background: var(--cor-superficie);

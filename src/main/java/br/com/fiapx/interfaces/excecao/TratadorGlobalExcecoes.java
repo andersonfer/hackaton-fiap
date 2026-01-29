@@ -2,6 +2,7 @@ package br.com.fiapx.interfaces.excecao;
 
 import br.com.fiapx.aplicacao.casosdeuso.AutenticarUsuario;
 import br.com.fiapx.dominio.excecao.AcessoNegadoException;
+import br.com.fiapx.dominio.excecao.EmailJaCadastradoException;
 import br.com.fiapx.dominio.excecao.VideoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,12 @@ public class TratadorGlobalExcecoes {
     @ExceptionHandler(AutenticarUsuario.CredenciaisInvalidasException.class)
     public ResponseEntity<ErroResposta> tratarCredenciaisInvalidas(AutenticarUsuario.CredenciaisInvalidasException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErroResposta(e.getMessage()));
+    }
+
+    @ExceptionHandler(EmailJaCadastradoException.class)
+    public ResponseEntity<ErroResposta> tratarEmailJaCadastrado(EmailJaCadastradoException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErroResposta(e.getMessage()));
     }
 
