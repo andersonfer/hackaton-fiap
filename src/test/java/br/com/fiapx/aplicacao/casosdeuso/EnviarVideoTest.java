@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +57,7 @@ class EnviarVideoTest {
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
 
-        when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
+        when(armazenamentoGateway.salvarVideo(eq(1L), eq(nomeArquivo), any())).thenReturn(caminhoVideo);
 
         Video resultado = enviarVideo.executar(usuarioId, nomeArquivo, conteudo);
 
@@ -65,22 +66,24 @@ class EnviarVideoTest {
         assertEquals(usuarioId, resultado.getUsuarioId());
         assertEquals(nomeArquivo, resultado.getNomeOriginal());
         assertEquals(StatusVideo.PENDENTE, resultado.getStatus());
+        assertEquals(caminhoVideo.toString(), resultado.getCaminhoArquivo());
 
         verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
     }
 
     @Test
-    void deveSalvarVideoAntesDePublicarNaFila() {
+    void deveSalvarVideoNoBancoAntesDeSalvarArquivo() {
         Long usuarioId = 1L;
         String nomeArquivo = "video.mp4";
         InputStream conteudo = new ByteArrayInputStream("conteudo".getBytes());
         Path caminhoVideo = Paths.get("/tmp/video.mp4");
 
-        when(armazenamentoGateway.salvarVideo(eq(nomeArquivo), any())).thenReturn(caminhoVideo);
+        when(armazenamentoGateway.salvarVideo(eq(1L), eq(nomeArquivo), any())).thenReturn(caminhoVideo);
 
         Video resultado = enviarVideo.executar(usuarioId, nomeArquivo, conteudo);
 
-        verify(videoRepositorio).salvar(any(Video.class));
+        verify(videoRepositorio, times(2)).salvar(any(Video.class));
+        verify(armazenamentoGateway).salvarVideo(eq(1L), eq(nomeArquivo), any());
         verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
     }
 }

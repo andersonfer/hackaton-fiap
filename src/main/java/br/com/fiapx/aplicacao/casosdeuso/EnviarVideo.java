@@ -23,9 +23,11 @@ public class EnviarVideo {
     }
 
     public Video executar(Long usuarioId, String nomeArquivo, InputStream conteudo) {
-        Path caminhoVideo = armazenamentoGateway.salvarVideo(nomeArquivo, conteudo);
+        Video video = new Video(usuarioId, nomeArquivo, null);
+        video = videoRepositorio.salvar(video);
 
-        Video video = new Video(usuarioId, nomeArquivo, caminhoVideo.toString());
+        Path caminhoVideo = armazenamentoGateway.salvarVideo(video.getId(), nomeArquivo, conteudo);
+        video.setCaminhoArquivo(caminhoVideo.toString());
         video = videoRepositorio.salvar(video);
 
         filaMensagemGateway.publicarParaProcessamento(video.getId(), caminhoVideo.toString());

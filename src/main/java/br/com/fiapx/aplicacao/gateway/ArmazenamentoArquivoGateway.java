@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 public interface ArmazenamentoArquivoGateway {
 
-    Path salvarVideo(String nomeArquivo, InputStream conteudo);
+    Path salvarVideo(Long videoId, String nomeArquivo, InputStream conteudo);
 
     Path obterCaminhoZip(Long videoId);
 

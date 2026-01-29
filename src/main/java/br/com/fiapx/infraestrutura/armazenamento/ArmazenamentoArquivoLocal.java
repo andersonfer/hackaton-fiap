@@ -28,9 +28,9 @@ public class ArmazenamentoArquivoLocal implements ArmazenamentoArquivoGateway {
     }
 
     @Override
-    public Path salvarVideo(String nomeArquivo, InputStream conteudo) {
+    public Path salvarVideo(Long videoId, String nomeArquivo, InputStream conteudo) {
         try {
-            Path destino = Paths.get(diretorioVideos, System.currentTimeMillis() + "_" + nomeArquivo);
+            Path destino = Paths.get(diretorioVideos, videoId + "_" + nomeArquivo);
             Files.copy(conteudo, destino, StandardCopyOption.REPLACE_EXISTING);
             return destino;
         } catch (IOException e) {
