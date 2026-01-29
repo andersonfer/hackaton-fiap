@@ -44,25 +44,26 @@ public class ProcessadorVideoFFmpeg implements ProcessadorVideoGateway {
     }
 
     private void extrairFrames(Path caminhoVideo, Path diretorioSaida) throws IOException, InterruptedException {
-        String comando = String.format(
-                "ffmpeg -i %s -vf fps=1 %s/frame_%%04d.png",
-                caminhoVideo.toAbsolutePath(),
-                diretorioSaida.toAbsolutePath()
-        );
+        String padraoSaida = diretorioSaida.toAbsolutePath().resolve("frame_%04d.png").toString();
 
-        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", comando);
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "ffmpeg", "-i", caminhoVideo.toAbsolutePath().toString(),
+                "-vf", "fps=1", padraoSaida
+        );
         processBuilder.redirectErrorStream(true);
         Process processo = processBuilder.start();
 
+        StringBuilder saida = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(processo.getInputStream()))) {
-            while (reader.readLine() != null) {
-                // Consome a saida do processo
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                saida.append(linha).append("\n");
             }
         }
 
         int exitCode = processo.waitFor();
         if (exitCode != 0) {
-            throw new RuntimeException("FFmpeg retornou codigo de erro: " + exitCode);
+            throw new RuntimeException("FFmpeg retornou codigo de erro: " + exitCode + ". Saida: " + saida);
         }
     }
 

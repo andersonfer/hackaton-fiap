@@ -37,6 +37,8 @@ public class ProcessarVideo {
             armazenamentoGateway.deletarArquivo(caminhoVideo);
         } catch (Exception e) {
             video.marcarComoFalha(e.getMessage());
+            videoRepositorio.salvar(video);
+            throw new RuntimeException("Falha ao processar video " + videoId + ": " + e.getMessage(), e);
         }
 
         videoRepositorio.salvar(video);

@@ -108,7 +108,8 @@ class ProcessarVideoTest {
             return v;
         });
 
-        processarVideo.executar(videoId, caminhoArquivo);
+        assertThrows(RuntimeException.class, () ->
+                processarVideo.executar(videoId, caminhoArquivo));
 
         assertEquals(2, statusCapturados.size());
         assertEquals(StatusVideo.FALHA, statusCapturados.get(1));
@@ -157,7 +158,8 @@ class ProcessarVideoTest {
                 .thenThrow(new RuntimeException("Erro no processamento"));
         when(videoRepositorio.salvar(any())).thenReturn(video);
 
-        processarVideo.executar(videoId, caminhoArquivo);
+        assertThrows(RuntimeException.class, () ->
+                processarVideo.executar(videoId, caminhoArquivo));
 
         verify(armazenamentoGateway, never()).deletarArquivo(any());
     }
