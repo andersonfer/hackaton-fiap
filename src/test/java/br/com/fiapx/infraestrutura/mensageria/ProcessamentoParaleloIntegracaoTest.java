@@ -119,9 +119,9 @@ class ProcessamentoParaleloIntegracaoTest {
         // Act: publicar 3 mensagens simultaneamente
         long inicio = System.currentTimeMillis();
 
-        publicadorMensagemVideo.publicar(video1.getId(), video1.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video2.getId(), video2.getCaminhoArquivo());
-        publicadorMensagemVideo.publicar(video3.getId(), video3.getCaminhoArquivo());
+        publicadorMensagemVideo.publicar(video1.getId(), video1.getCaminhoArquivo(), video1.getUsuarioId());
+        publicadorMensagemVideo.publicar(video2.getId(), video2.getCaminhoArquivo(), video2.getUsuarioId());
+        publicadorMensagemVideo.publicar(video3.getId(), video3.getCaminhoArquivo(), video3.getUsuarioId());
 
         // Aguarda processamento (polling)
         await().atMost(Duration.ofSeconds(15))

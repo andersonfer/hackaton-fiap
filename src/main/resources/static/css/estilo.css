@@ -281,6 +281,11 @@ body {
     background-color: rgba(99, 102, 241, 0.06);
 }
 
+.zona-upload.desabilitado {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .zona-upload input[type="file"] {
     position: absolute;
     inset: 0;

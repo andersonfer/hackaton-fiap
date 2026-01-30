@@ -46,7 +46,7 @@ public class AgendadorReprocessamento {
             video.setStatus(StatusVideo.PENDENTE);
             videoRepositorio.salvar(video);
 
-            filaMensagemGateway.publicarParaProcessamento(video.getId(), video.getCaminhoArquivo());
+            filaMensagemGateway.publicarParaProcessamento(video.getId(), video.getCaminhoArquivo(), video.getUsuarioId());
         }
 
         if (!videosTravados.isEmpty()) {

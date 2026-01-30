@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public record MensagemProcessamentoVideo(
         Long videoId,
-        String caminhoArquivo
+        String caminhoArquivo,
+        Long usuarioId
 ) implements Serializable {
 }

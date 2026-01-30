@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var arquivosParaEnviar = [];
     var intervaloAtualizacao = null;
+    var LIMITE_TOTAL_BYTES = 1024 * 1024 * 1024; // 1GB
 
     // Mostrar email do usuario
     emailUsuario.textContent = localStorage.getItem('email') || '';
@@ -96,7 +97,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
+    function calcularTamanhoTotal() {
+        var total = 0;
+        for (var i = 0; i < arquivosParaEnviar.length; i++) {
+            total += arquivosParaEnviar[i].size;
+        }
+        return total;
+    }
+
     function renderizarArquivosSelecionados() {
+        esconderErroUpload();
+
         if (arquivosParaEnviar.length === 0) {
             arquivosSelecionados.classList.remove('visivel');
             btnEnviar.disabled = true;
@@ -104,7 +115,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         arquivosSelecionados.classList.add('visivel');
-        btnEnviar.disabled = false;
+        var tamanhoTotal = calcularTamanhoTotal();
+        var excedeLimite = tamanhoTotal > LIMITE_TOTAL_BYTES;
+
+        if (excedeLimite) {
+            mostrarErroUpload('Tamanho total (' + formatarTamanho(tamanhoTotal) + ') excede o limite de 500 MB. Remova alguns arquivos antes de enviar.');
+        }
+
+        btnEnviar.disabled = excedeLimite;
 
         var html = '';
         for (var i = 0; i < arquivosParaEnviar.length; i++) {
@@ -136,6 +154,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function enviarArquivos() {
         esconderErroUpload();
         btnEnviar.disabled = true;
+        inputArquivos.disabled = true;
+        zonaUpload.classList.add('desabilitado');
         progressoUpload.classList.add('visivel');
         barraProgresso.style.width = '0%';
 
@@ -159,6 +179,8 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.addEventListener('load', function () {
             progressoUpload.classList.remove('visivel');
             btnEnviar.disabled = false;
+            inputArquivos.disabled = false;
+            zonaUpload.classList.remove('desabilitado');
 
             if (xhr.status === 200) {
                 arquivosParaEnviar = [];
@@ -178,6 +200,8 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.addEventListener('error', function () {
             progressoUpload.classList.remove('visivel');
             btnEnviar.disabled = false;
+            inputArquivos.disabled = false;
+            zonaUpload.classList.remove('desabilitado');
             mostrarErroUpload('Erro de conexao. Verifique sua rede e tente novamente.');
         });
 

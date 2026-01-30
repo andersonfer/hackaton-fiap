@@ -15,7 +15,7 @@ public class FilaMensagemGatewayImpl implements FilaMensagemGateway {
     }
 
     @Override
-    public void publicarParaProcessamento(Long videoId, String caminhoArquivo) {
-        publicador.publicar(videoId, caminhoArquivo);
+    public void publicarParaProcessamento(Long videoId, String caminhoArquivo, Long usuarioId) {
+        publicador.publicar(videoId, caminhoArquivo, usuarioId);
     }
 }

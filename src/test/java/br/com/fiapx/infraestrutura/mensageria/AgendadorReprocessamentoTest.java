@@ -50,7 +50,7 @@ class AgendadorReprocessamentoTest {
         verify(videoRepositorio).salvar(videoCaptor.capture());
         assertEquals(StatusVideo.PENDENTE, videoCaptor.getValue().getStatus());
 
-        verify(filaMensagemGateway).publicarParaProcessamento(1L, "/tmp/videos/video1.mp4");
+        verify(filaMensagemGateway).publicarParaProcessamento(1L, "/tmp/videos/video1.mp4", 1L);
     }
 
     @Test
@@ -65,8 +65,8 @@ class AgendadorReprocessamentoTest {
         agendador.verificarVideosTravados();
 
         verify(videoRepositorio, times(2)).salvar(any());
-        verify(filaMensagemGateway).publicarParaProcessamento(1L, "/tmp/videos/video1.mp4");
-        verify(filaMensagemGateway).publicarParaProcessamento(2L, "/tmp/videos/video2.mp4");
+        verify(filaMensagemGateway).publicarParaProcessamento(1L, "/tmp/videos/video1.mp4", 1L);
+        verify(filaMensagemGateway).publicarParaProcessamento(2L, "/tmp/videos/video2.mp4", 1L);
     }
 
     @Test
@@ -77,7 +77,7 @@ class AgendadorReprocessamentoTest {
         agendador.verificarVideosTravados();
 
         verify(videoRepositorio, never()).salvar(any());
-        verify(filaMensagemGateway, never()).publicarParaProcessamento(any(), any());
+        verify(filaMensagemGateway, never()).publicarParaProcessamento(any(), any(), any());
     }
 
     @Test

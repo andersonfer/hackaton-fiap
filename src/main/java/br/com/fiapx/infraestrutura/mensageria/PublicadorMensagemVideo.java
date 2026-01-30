@@ -18,8 +18,8 @@ public class PublicadorMensagemVideo {
         this.filaProcessamento = filaProcessamento;
     }
 
-    public void publicar(Long videoId, String caminhoArquivo) {
-        MensagemProcessamentoVideo mensagem = new MensagemProcessamentoVideo(videoId, caminhoArquivo);
+    public void publicar(Long videoId, String caminhoArquivo, Long usuarioId) {
+        MensagemProcessamentoVideo mensagem = new MensagemProcessamentoVideo(videoId, caminhoArquivo, usuarioId);
         rabbitTemplate.convertAndSend(filaProcessamento, mensagem);
     }
 }

@@ -68,7 +68,7 @@ class EnviarVideoTest {
         assertEquals(StatusVideo.PENDENTE, resultado.getStatus());
         assertEquals(caminhoVideo.toString(), resultado.getCaminhoArquivo());
 
-        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
+        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString(), usuarioId);
     }
 
     @Test
@@ -84,6 +84,6 @@ class EnviarVideoTest {
 
         verify(videoRepositorio, times(2)).salvar(any(Video.class));
         verify(armazenamentoGateway).salvarVideo(eq(1L), eq(nomeArquivo), any());
-        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString());
+        verify(filaMensagemGateway).publicarParaProcessamento(resultado.getId(), caminhoVideo.toString(), usuarioId);
     }
 }

@@ -30,7 +30,7 @@ public class EnviarVideo {
         video.setCaminhoArquivo(caminhoVideo.toString());
         video = videoRepositorio.salvar(video);
 
-        filaMensagemGateway.publicarParaProcessamento(video.getId(), caminhoVideo.toString());
+        filaMensagemGateway.publicarParaProcessamento(video.getId(), caminhoVideo.toString(), usuarioId);
 
         return video;
     }

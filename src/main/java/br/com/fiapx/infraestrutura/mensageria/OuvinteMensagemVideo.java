@@ -22,12 +22,12 @@ public class OuvinteMensagemVideo {
     @RabbitListener(queues = "${app.mensageria.fila-processamento}",
                     concurrency = "${app.processamento.max-paralelo:5}")
     public void processar(MensagemProcessamentoVideo mensagem) {
-        log.info("Processando video: {} na thread {}", mensagem.videoId(), Thread.currentThread().getName());
+        log.info("Processando video: {} (usuario: {}) na thread {}", mensagem.videoId(), mensagem.usuarioId(), Thread.currentThread().getName());
         try {
             processarVideo.executar(mensagem.videoId(), mensagem.caminhoArquivo());
-            log.info("Video processado com sucesso: {}", mensagem.videoId());
+            log.info("Video processado com sucesso: {} (usuario: {})", mensagem.videoId(), mensagem.usuarioId());
         } catch (Exception e) {
-            log.error("Erro ao processar video {}: {}", mensagem.videoId(), e.getMessage());
+            log.error("Erro ao processar video {} (usuario: {}): {}", mensagem.videoId(), mensagem.usuarioId(), e.getMessage());
         }
     }
 }
