@@ -63,6 +63,8 @@
 
 ### ✅ Entrega 8: CI/CD
 - [x] GitHub Actions pipeline (build, test, docker)
+- [x] Simplificar fluxo para PRs diretos na main (remover branch develop)
+- [x] Branch protection na main (status check build, enforce admins, linear history)
 
 ### ⏳ Entrega 9: Refatorar Excecoes ← ATUAL
 - [ ] Mover `CredenciaisInvalidasException` para `dominio/excecao/`
