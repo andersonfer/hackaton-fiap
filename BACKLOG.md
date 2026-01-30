@@ -43,7 +43,7 @@
   - ListarVideosTest (4 testes)
   - GAP documentado: Acesso cross-user no download (teste @Disabled)
 
-### ✅ Entrega 5b: Concorrencia On-Demand
+### ✅ Entrega 6: Concorrencia On-Demand
 - [x] ConfiguracaoExecutor (ThreadPoolTaskExecutor elastico)
 - [x] OuvinteMensagemVideo delega ao executor (ack imediato)
 - [x] AgendadorReprocessamento (scheduler para videos travados)
@@ -51,7 +51,7 @@
 - [x] Testes unitarios do AgendadorReprocessamento (4 testes)
 - [x] application.yml: concorrencia=1, config reprocessamento
 
-### ✅ Entrega 5c: Interface Grafica (Frontend)
+### ✅ Entrega 7: Interface Grafica (Frontend)
 - [x] Tela de Login (login.html)
 - [x] Tela Meus Videos (index.html) - upload, listagem, download
 - [x] CSS (estilo.css) - design responsivo
@@ -61,41 +61,10 @@
 - [x] Auto-refresh da lista de videos (polling 5s)
 - [x] Download de ZIP com autenticacao via JWT
 
-### ⏳ Entrega 5d: Testes E2E de UI com Selenium
-- [ ] Adicionar dependencias (selenium-java, webdrivermanager) no pom.xml
-- [ ] Criar classe base de teste Selenium com setup/teardown do WebDriver
-- [ ] Teste E2E: fluxo de login (login valido, credenciais invalidas)
-- [ ] Teste E2E: fluxo de registro de usuario
-- [ ] Teste E2E: upload de video via UI (drag-and-drop ou file input)
-- [ ] Teste E2E: listagem de videos e verificacao de status
-- [ ] Teste E2E: download de ZIP via UI
-- [ ] Teste E2E: fluxo completo (login → upload → aguardar processamento → download)
-- [ ] Configurar execucao headless para CI
+### ✅ Entrega 8: CI/CD
+- [x] GitHub Actions pipeline (build, test, docker)
 
-### ⏳ Entrega 5e: Migrar Testes E2E de UI para Playwright (OPCIONAL)
-- [ ] Substituir Selenium por Playwright Java (com.microsoft.playwright)
-- [ ] Reescrever testes aproveitando auto-wait e locators modernos
-- [ ] Configurar trace viewer para debug de falhas
-- [ ] Avaliar ganho de performance e estabilidade vs Selenium
-
-### ⏳ Entrega 6: CI/CD + Documentacao ← ATUAL
-- [ ] GitHub Actions pipeline (build, test, docker)
-- [ ] README completo com instrucoes
-- [ ] Documentacao da arquitetura (diagrama)
-
-### ⏳ Entrega 7: Kubernetes (OPCIONAL)
-- [ ] Manifests k8s
-- [ ] PersistentVolume
-- [ ] Deploy MySQL/RabbitMQ
-- [ ] Script para minikube
-
-### ⏳ Entrega 8: Correcao de Seguranca (OPCIONAL)
-- [ ] Validar propriedade do video no download (acesso cross-user)
-  - Arquivo: BaixarVideo.java e/ou VideoControlador.java
-  - Verificar se video.usuarioId == usuarioAutenticado.id antes de permitir download
-  - Habilitar teste: VideoControladorTest.deveNegarAcessoAoBaixarVideoDeOutroUsuario()
-
-### ⏳ Entrega 9: Refatorar Excecoes
+### ⏳ Entrega 9: Refatorar Excecoes ← ATUAL
 - [ ] Mover `CredenciaisInvalidasException` para `dominio/excecao/`
 - [ ] Criar `ProcessamentoVideoException` para erros de processamento FFmpeg
 - [ ] Criar `ArmazenamentoException` para erros de I/O no armazenamento
@@ -121,7 +90,40 @@
 - [ ] Criar excecao `ValidacaoException` em `dominio/excecao/`
 - [ ] Adicionar testes para cada validacao
 
-### ⏳ Entrega 12: Cancelamento de Processamento (OPCIONAL)
+### ⏳ Entrega 12: Documentacao
+- [ ] README completo com instrucoes
+- [ ] Documentacao da arquitetura (diagrama)
+
+### ⏳ Entrega 13: Testes E2E de UI com Selenium
+- [ ] Adicionar dependencias (selenium-java, webdrivermanager) no pom.xml
+- [ ] Criar classe base de teste Selenium com setup/teardown do WebDriver
+- [ ] Teste E2E: fluxo de login (login valido, credenciais invalidas)
+- [ ] Teste E2E: fluxo de registro de usuario
+- [ ] Teste E2E: upload de video via UI (drag-and-drop ou file input)
+- [ ] Teste E2E: listagem de videos e verificacao de status
+- [ ] Teste E2E: download de ZIP via UI
+- [ ] Teste E2E: fluxo completo (login → upload → aguardar processamento → download)
+- [ ] Configurar execucao headless para CI
+
+### ⏳ Entrega 14: Migrar Testes E2E de UI para Playwright (OPCIONAL)
+- [ ] Substituir Selenium por Playwright Java (com.microsoft.playwright)
+- [ ] Reescrever testes aproveitando auto-wait e locators modernos
+- [ ] Configurar trace viewer para debug de falhas
+- [ ] Avaliar ganho de performance e estabilidade vs Selenium
+
+### ⏳ Entrega 15: Kubernetes (OPCIONAL)
+- [ ] Manifests k8s
+- [ ] PersistentVolume
+- [ ] Deploy MySQL/RabbitMQ
+- [ ] Script para minikube
+
+### ⏳ Entrega 16: Correcao de Seguranca (OPCIONAL)
+- [ ] Validar propriedade do video no download (acesso cross-user)
+  - Arquivo: BaixarVideo.java e/ou VideoControlador.java
+  - Verificar se video.usuarioId == usuarioAutenticado.id antes de permitir download
+  - Habilitar teste: VideoControladorTest.deveNegarAcessoAoBaixarVideoDeOutroUsuario()
+
+### ⏳ Entrega 17: Cancelamento de Processamento (OPCIONAL)
 - [ ] Novo status CANCELADO no enum StatusVideo
 - [ ] Remover shell intermediario (sh -c) do ProcessadorVideoFFmpeg para destroy() confiavel
 - [ ] Armazenar referencia ao Process por videoId (ConcurrentHashMap)
