@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function adicionarArquivos(novos) {
         var ignorados = 0;
         for (var i = 0; i < novos.length; i++) {
-            if (arquivosParaEnviar.length >= 5) {
+            if (arquivosParaEnviar.length >= 20) {
                 ignorados += novos.length - i;
                 break;
             }
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         renderizarArquivosSelecionados();
         if (ignorados > 0) {
-            mostrarErroUpload('Limite de 5 videos por envio. ' + ignorados + (ignorados === 1 ? ' arquivo foi ignorado.' : ' arquivos foram ignorados.'));
+            mostrarErroUpload('Limite de 20 videos por envio. ' + ignorados + (ignorados === 1 ? ' arquivo foi ignorado.' : ' arquivos foram ignorados.'));
         }
     }
 
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 '</div>';
         }
         listaArquivos.innerHTML = html;
-        contadorArquivos.textContent = arquivosParaEnviar.length + ' de 5 arquivos';
+        contadorArquivos.textContent = arquivosParaEnviar.length + ' de 20 arquivos';
 
         // Bind botoes remover
         var botoes = listaArquivos.querySelectorAll('.arquivo-item-remover');
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.removeItem('email');
                 window.location.href = '/login.html';
             } else if (xhr.status === 400) {
-                mostrarErroUpload('Selecione no maximo 5 arquivos de video.');
+                mostrarErroUpload('Selecione no maximo 20 arquivos de video.');
             } else {
                 mostrarErroUpload('Erro ao enviar videos. Tente novamente.');
             }

@@ -16,6 +16,8 @@ spring:
       - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
 
 app:
+  processamento:
+    max-paralelo: 5
   armazenamento:
     diretorio-videos: /tmp/fiapx-test/videos
     diretorio-frames: /tmp/fiapx-test/frames

@@ -22,11 +22,16 @@ spring:
     port: ${SPRING_RABBITMQ_PORT:5672}
     username: ${SPRING_RABBITMQ_USERNAME:fiapx}
     password: ${SPRING_RABBITMQ_PASSWORD:fiapx123}
+    listener:
+      simple:
+        prefetch: 1
 
 server:
   port: 8080
 
 app:
+  processamento:
+    max-paralelo: ${MAX_PARALELO:5}
   armazenamento:
     diretorio-videos: ${DIRETORIO_VIDEOS:/tmp/fiapx/videos}
     diretorio-frames: ${DIRETORIO_FRAMES:/tmp/fiapx/frames}

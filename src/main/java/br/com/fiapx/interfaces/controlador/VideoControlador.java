@@ -47,7 +47,7 @@ public class VideoControlador {
     public ResponseEntity<List<VideoResposta>> enviarLote(
             @AuthenticationPrincipal UsuarioAutenticado usuario,
             @RequestParam("videos") List<MultipartFile> arquivos) throws IOException {
-        if (arquivos.size() > 5) {
+        if (arquivos.size() > 20) {
             return ResponseEntity.badRequest().build();
         }
 
