@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var arquivosParaEnviar = [];
     var intervaloAtualizacao = null;
     var LIMITE_TOTAL_BYTES = 1024 * 1024 * 1024; // 1GB
+    var statusConhecidos = {}; // { videoId: status } - rastreia transicoes para notificar falhas
+    var containerNotificacoes = document.getElementById('containerNotificacoes');
 
     // Mostrar email do usuario
     emailUsuario.textContent = localStorage.getItem('email') || '';
@@ -235,11 +237,50 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(function (videos) {
             if (videos === null) return;
+            verificarNotificacoes(videos);
             renderizarTabela(videos);
         })
         .catch(function () {
             // Silencioso - tenta novamente no proximo ciclo
         });
+    }
+
+    function verificarNotificacoes(videos) {
+        for (var i = 0; i < videos.length; i++) {
+            var v = videos[i];
+            var statusAnterior = statusConhecidos[v.id];
+            if (v.status === 'FALHA' && statusAnterior !== undefined && statusAnterior !== 'FALHA') {
+                exibirNotificacaoFalha(v.nomeOriginal, v.mensagemErro);
+            }
+            statusConhecidos[v.id] = v.status;
+        }
+    }
+
+    function exibirNotificacaoFalha(nomeVideo, mensagemErro) {
+        var notificacao = document.createElement('div');
+        notificacao.className = 'notificacao';
+        notificacao.innerHTML =
+            '<span class="notificacao-icone">&#9888;&#65039;</span>' +
+            '<div class="notificacao-corpo">' +
+                '<div class="notificacao-titulo">Falha no processamento</div>' +
+                '<div class="notificacao-mensagem">' +
+                    '<strong>' + escapeHtml(nomeVideo) + '</strong>' +
+                    (mensagemErro ? '<br>' + escapeHtml(mensagemErro) : '') +
+                '</div>' +
+            '</div>' +
+            '<button class="notificacao-fechar" title="Fechar">&times;</button>';
+
+        notificacao.querySelector('.notificacao-fechar').addEventListener('click', function () {
+            containerNotificacoes.removeChild(notificacao);
+        });
+
+        containerNotificacoes.appendChild(notificacao);
+
+        setTimeout(function () {
+            if (notificacao.parentNode === containerNotificacoes) {
+                containerNotificacoes.removeChild(notificacao);
+            }
+        }, 8000);
     }
 
     function renderizarTabela(videos) {
