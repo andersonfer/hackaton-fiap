@@ -556,6 +556,64 @@ tbody tr:hover {
     to { transform: rotate(360deg); }
 }
 
+/* Notificacoes toast */
+.notificacao {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-left: 4px solid var(--cor-erro);
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-md);
+    padding: 0.875rem 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    animation: notificacao-entrar 0.25s ease;
+}
+
+@keyframes notificacao-entrar {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.notificacao-icone {
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    margin-top: 0.0625rem;
+}
+
+.notificacao-corpo {
+    flex: 1;
+    min-width: 0;
+}
+
+.notificacao-titulo {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--cor-erro);
+    margin-bottom: 0.25rem;
+}
+
+.notificacao-mensagem {
+    font-size: 0.8125rem;
+    color: var(--cor-texto-secundario);
+    word-break: break-word;
+}
+
+.notificacao-fechar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--cor-texto-secundario);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.notificacao-fechar:hover {
+    color: var(--cor-texto);
+}
+
 /* Responsivo */
 @media (max-width: 640px) {
     .conteudo {
