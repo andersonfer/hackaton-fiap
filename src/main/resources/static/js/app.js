@@ -51,15 +51,36 @@ document.addEventListener('DOMContentLoaded', function () {
     zonaUpload.addEventListener('drop', function (e) {
         e.preventDefault();
         zonaUpload.classList.remove('arrastando');
-        var files = Array.from(e.dataTransfer.files).filter(function (f) {
-            return f.type.startsWith('video/');
-        });
-        adicionarArquivos(files);
+        var todos = Array.from(e.dataTransfer.files);
+        var videos = todos.filter(function (f) { return f.type.startsWith('video/'); });
+        var naoVideos = todos.filter(function (f) { return !f.type.startsWith('video/'); });
+        if (naoVideos.length > 0) {
+            mostrarErroUpload(
+                naoVideos.length === 1
+                    ? 'Arquivo "' + naoVideos[0].name + '" nao e um video. Selecione apenas arquivos de video.'
+                    : naoVideos.length + ' arquivos ignorados: apenas videos sao aceitos (MP4, AVI, MOV, etc.).'
+            );
+        }
+        if (videos.length > 0) {
+            adicionarArquivos(videos);
+        }
     });
 
     // Selecao de arquivos
     inputArquivos.addEventListener('change', function () {
-        adicionarArquivos(Array.from(inputArquivos.files));
+        var todos = Array.from(inputArquivos.files);
+        var videos = todos.filter(function (f) { return f.type.startsWith('video/'); });
+        var naoVideos = todos.filter(function (f) { return !f.type.startsWith('video/'); });
+        if (naoVideos.length > 0) {
+            mostrarErroUpload(
+                naoVideos.length === 1
+                    ? 'Arquivo "' + naoVideos[0].name + '" nao e um video. Selecione apenas arquivos de video.'
+                    : naoVideos.length + ' arquivos ignorados: apenas videos sao aceitos (MP4, AVI, MOV, etc.).'
+            );
+        }
+        if (videos.length > 0) {
+            adicionarArquivos(videos);
+        }
         inputArquivos.value = '';
     });
 
