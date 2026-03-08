@@ -18,6 +18,7 @@
 - [x] Documentacao da API REST com exemplos curl
 - [x] Estrutura do projeto documentada
 
-### ⏳ Entrega 4: Video de Apresentacao ← ATUAL
+### 🔄 Entrega 4: Video de Apresentacao ← ATUAL
+- [x] Roteiro detalhado com timecodes e requisitos mapeados (docs/roteiro-video-apresentacao.md)
 - [ ] Gravar video de no maximo 10 minutos
 - [ ] Cobrir: documentacao, arquitetura escolhida e o projeto funcionando
