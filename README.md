@@ -115,7 +115,68 @@ RabbitMQ (fila.video.processamento)
 - Docker e Docker Compose instalados
 - Porta 8080 disponivel (aplicacao)
 - Porta 3306 disponivel (MySQL)
-- Porta 5672 / 15672 disponivel (RabbitMQ)
+- Porta 5672 / 15672 disponivel (RabbitMQ) — painel: http://localhost:15672 (usuario: `fiapx` / senha: `fiapx123`)
+
+---
+
+## Banco de Dados
+
+O script de criacao das tabelas esta em `docker/init.sql` e e executado automaticamente pelo MySQL na primeira inicializacao.
+
+### Schema
+
+```sql
+-- Usuarios do sistema
+CREATE TABLE usuarios (
+    id         BIGINT       NOT NULL AUTO_INCREMENT,
+    email      VARCHAR(255) NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    criado_em  DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_usuarios_email (email)
+);
+
+-- Videos enviados por cada usuario
+CREATE TABLE videos (
+    id              BIGINT       NOT NULL AUTO_INCREMENT,
+    usuario_id      BIGINT       NOT NULL,
+    nome_original   VARCHAR(255) NOT NULL,
+    status          VARCHAR(20)  NOT NULL DEFAULT 'PENDENTE',
+    caminho_arquivo VARCHAR(500),
+    caminho_zip     VARCHAR(500),
+    mensagem_erro   TEXT,
+    criado_em       DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    atualizado_em   DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    CONSTRAINT fk_videos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+);
+```
+
+## Testes
+
+```bash
+# Executar todos os testes (unit + integracao)
+./mvnw clean verify
+
+# Apenas testes unitarios
+./mvnw test
+
+# Script de testes E2E via curl (requer o ambiente rodando)
+./scripts/e2e-tests.sh
+```
+
+Os testes de integracao usam **Testcontainers** (requer Docker disponivel na maquina).
+
+---
+
+## CI/CD
+
+O pipeline do GitHub Actions (`.github/workflows/ci.yml`) executa automaticamente a cada push ou pull request para a branch `main`:
+
+1. Build com Maven
+2. Execucao de todos os testes (`mvn clean verify`)
+3. Upload dos relatorios de teste como artefato
+4. Build da imagem Docker
 
 ---
 
