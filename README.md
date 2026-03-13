@@ -115,7 +115,7 @@ RabbitMQ (fila.video.processamento)
 - Docker e Docker Compose instalados
 - Porta 8080 disponivel (aplicacao)
 - Porta 3306 disponivel (MySQL)
-- Porta 5672 / 15672 disponivel (RabbitMQ)
+- Porta 5672 / 15672 disponivel (RabbitMQ) — painel: http://localhost:15672 (usuario: `fiapx` / senha: `fiapx123`)
 
 ---
 
