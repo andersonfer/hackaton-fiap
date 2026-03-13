@@ -6,6 +6,68 @@ Sistema que recebe upload de videos, extrai frames em paralelo via FFmpeg e disp
 
 ## Arquitetura
 
+### Decisoes Tecnicas
+
+| Aspecto | Escolha | Justificativa |
+|---|---|---|
+| Linguagem | Java 17 + Spring Boot 3.2 | Ecossistema maduro, suporte a Records para DTOs imutaveis |
+| Banco de dados | MySQL 8 | ACID, suporte JPA/Hibernate, amplamente adotado |
+| Mensageria | RabbitMQ 3 | Filas persistentes, garantia de entrega, controle de concorrencia via prefetch |
+| Autenticacao | JWT + Spring Security | Stateless, escalavel horizontalmente |
+| Processamento de video | FFmpeg via ProcessBuilder | Padrao da industria para manipulacao de video |
+| Armazenamento | Filesystem local com volume Docker | Simples para a escala atual; substituivel por S3 sem mudar casos de uso |
+| Containerizacao | Docker + Docker Compose | Ambiente reproduzível, pronto para evolucao a Kubernetes |
+| CI/CD | GitHub Actions | Integrado ao repositorio, sem custo adicional |
+| Arquitetura | Clean Architecture (monolito) | Separacao clara de responsabilidades, testabilidade, facil evolucao para microsservicos |
+
+### Arquitetura de Software: Clean Architecture
+
+```
+interfaces/          ← Controllers REST, DTOs de entrada/saida
+    └─ controlador/
+    └─ dto/
+    └─ excecao/
+
+aplicacao/           ← Casos de uso (regras de negocio da aplicacao)
+    └─ casosdeuso/
+    └─ gateway/      ← Interfaces para servicos externos
+
+dominio/             ← Entidades e regras de dominio puras (sem dependencias externas)
+    └─ entidade/
+    └─ enums/
+    └─ excecao/
+    └─ repositorio/  ← Interfaces de repositorio
+
+infraestrutura/      ← Implementacoes: JPA, RabbitMQ, FFmpeg, JWT, filesystem
+    └─ persistencia/
+    └─ mensageria/
+    └─ processador/
+    └─ armazenamento/
+    └─ seguranca/
+```
+
+### Fluxo de Processamento Assincrono
+
+```
+POST /api/videos/enviar
+  │
+  ├─ Valida JWT (extrai usuarioId)
+  ├─ Salva arquivo no filesystem
+  ├─ Cria registro no banco (status=PENDENTE)
+  ├─ Publica mensagem na fila RabbitMQ
+  └─ Retorna { id, status: "PENDENTE" } imediatamente
+
+RabbitMQ (fila.video.processamento)
+  │
+  └─ OuvinteMensagemVideo (ate 5 consumidores paralelos)
+       ├─ Atualiza status -> PROCESSANDO
+       ├─ FFmpeg extrai frames (1 frame/segundo)
+       ├─ Compacta frames em ZIP
+       ├─ Atualiza status -> CONCLUIDO (ou FALHA + mensagem de erro)
+       └─ Remove arquivo de video original
+```
+
+
 ### Visao Geral
 
 ```
@@ -43,66 +105,8 @@ Sistema que recebe upload de videos, extrai frames em paralelo via FFmpeg e disp
                                     └───────────────────────────┘
 ```
 
-### Fluxo de Processamento Assincrono
 
-```
-POST /api/videos/enviar
-  │
-  ├─ Valida JWT (extrai usuarioId)
-  ├─ Salva arquivo no filesystem
-  ├─ Cria registro no banco (status=PENDENTE)
-  ├─ Publica mensagem na fila RabbitMQ
-  └─ Retorna { id, status: "PENDENTE" } imediatamente
 
-RabbitMQ (fila.video.processamento)
-  │
-  └─ OuvinteMensagemVideo (ate 5 consumidores paralelos)
-       ├─ Atualiza status -> PROCESSANDO
-       ├─ FFmpeg extrai frames (1 frame/segundo)
-       ├─ Compacta frames em ZIP
-       ├─ Atualiza status -> CONCLUIDO (ou FALHA + mensagem de erro)
-       └─ Remove arquivo de video original
-```
-
-### Arquitetura de Software: Clean Architecture
-
-```
-interfaces/          ← Controllers REST, DTOs de entrada/saida
-    └─ controlador/
-    └─ dto/
-    └─ excecao/
-
-aplicacao/           ← Casos de uso (regras de negocio da aplicacao)
-    └─ casosdeuso/
-    └─ gateway/      ← Interfaces para servicos externos
-
-dominio/             ← Entidades e regras de dominio puras (sem dependencias externas)
-    └─ entidade/
-    └─ enums/
-    └─ excecao/
-    └─ repositorio/  ← Interfaces de repositorio
-
-infraestrutura/      ← Implementacoes: JPA, RabbitMQ, FFmpeg, JWT, filesystem
-    └─ persistencia/
-    └─ mensageria/
-    └─ processador/
-    └─ armazenamento/
-    └─ seguranca/
-```
-
-### Decisoes Tecnicas
-
-| Aspecto | Escolha | Justificativa |
-|---|---|---|
-| Linguagem | Java 17 + Spring Boot 3.2 | Ecossistema maduro, suporte a Records para DTOs imutaveis |
-| Banco de dados | MySQL 8 | ACID, suporte JPA/Hibernate, amplamente adotado |
-| Mensageria | RabbitMQ 3 | Filas persistentes, garantia de entrega, controle de concorrencia via prefetch |
-| Autenticacao | JWT + Spring Security | Stateless, escalavel horizontalmente |
-| Processamento de video | FFmpeg via ProcessBuilder | Padrao da industria para manipulacao de video |
-| Armazenamento | Filesystem local com volume Docker | Simples para a escala atual; substituivel por S3 sem mudar casos de uso |
-| Containerizacao | Docker + Docker Compose | Ambiente reproducivel, pronto para evolucao a Kubernetes |
-| CI/CD | GitHub Actions | Integrado ao repositorio, sem custo adicional |
-| Arquitetura | Clean Architecture (monolito) | Separacao clara de responsabilidades, testabilidade, facil evolucao para microsservicos |
 
 ---
 
